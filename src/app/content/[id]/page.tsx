@@ -18,6 +18,7 @@ import {
   ArrowLeft,
   Sparkles,
   ShieldAlert,
+  Info,
 } from 'lucide-react';
 import type { ContentDetail, FindingRow } from '@/server/services/content';
 
@@ -317,6 +318,44 @@ export default function ContentDetailPage({
           )}
         </div>
       </div>
+
+      {/* Contextual Judge Guide Banner */}
+      {activeVer.state === 'draft' && unresolvedBlockers > 0 && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50/70 p-4 text-xs text-ink flex items-start gap-3">
+          <AlertTriangle className="h-4 w-4 text-red-pen shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <span className="font-semibold text-red-900 text-sm">Action Needed: {unresolvedBlockers} Blocker(s) Found</span>
+            <p className="text-red-800 leading-relaxed">
+              ProofGate enforces brand compliance: you cannot submit content for review with unaddressed contradictions.
+              Click <strong>&ldquo;Apply fix&rdquo;</strong> on the red blocker cards to automatically insert the approved facts, or click <strong>&ldquo;Dismiss with reason&rdquo;</strong> to record a documented override.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {activeVer.state === 'draft' && unresolvedBlockers === 0 && (
+        <div className="mb-6 rounded-xl border border-emerald-300 bg-emerald-50/80 p-4 text-xs text-ink flex items-start gap-3">
+          <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <span className="font-semibold text-emerald-900 text-sm">All Blockers Resolved! Ready for Review</span>
+            <p className="text-emerald-800 leading-relaxed">
+              All conflicting claims have been resolved. Click the blue <strong>&ldquo;Submit for Review&rdquo;</strong> button above to lock this version and send it to the human reviewer queue.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {activeVer.state === 'in_review' && (
+        <div className="mb-6 rounded-xl border border-indigo-200 bg-indigo-50/70 p-4 text-xs text-ink flex items-start gap-3">
+          <Info className="h-4 w-4 text-indigo shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <span className="font-semibold text-indigo-900 text-sm">Submitted for Human Clearance</span>
+            <p className="text-indigo-800 leading-relaxed">
+              This version is currently waiting in the Review Queue. Click <strong>&ldquo;Open Review Queue&rdquo;</strong> above (or switch your role to <strong>Reviewer</strong> in the top bar) to review and approve it.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

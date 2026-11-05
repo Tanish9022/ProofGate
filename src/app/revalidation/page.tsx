@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/Toast';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { AlertTriangle, CheckCircle2, RotateCcw, ChevronDown, ChevronRight, ArrowRight, ShieldCheck, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, RotateCcw, ChevronDown, ChevronRight, ArrowRight, ShieldCheck, Info, Sparkles } from 'lucide-react';
 import type { RevalidationItemDetail, NotAffectedItem } from '@/server/services/revalidate';
 
 export default function RevalidationPage() {
@@ -105,11 +105,44 @@ export default function RevalidationPage() {
         <div className="py-12">
           <EmptyState
             title="All clearances are up to date"
-            description="No active clearances have dependencies on outdated, expired, or superseded facts. ProofGate continuously monitors source versions."
+            description="No active clearances currently depend on outdated or superseded facts. ProofGate continuously monitors source version graphs."
+            action={
+              <div className="mt-4 p-4 rounded-xl border border-paper-line bg-paper-warm/60 max-w-lg mx-auto text-xs text-ink space-y-2 text-left">
+                <span className="font-semibold text-ink flex items-center gap-1.5">
+                  <Sparkles className="h-4 w-4 text-accent" />
+                  Judge Guide: How to see Revalidation in action
+                </span>
+                <p className="text-ink-muted leading-relaxed">
+                  1. Switch role to <strong>Admin</strong> in the top bar.<br />
+                  2. Open the <strong>Source Library</strong> and click <strong>&ldquo;BrightDesk Pro Monthly&rdquo;</strong>.<br />
+                  3. Click <strong>&ldquo;Add Version&rdquo;</strong>, change price to <strong>Rs. 699</strong>, and publish.<br />
+                  4. Return here to see only the dependent poster re-opened!
+                </p>
+                <div className="pt-2">
+                  <Link href="/library">
+                    <Button size="sm" variant="primary">
+                      Go to Source Library &rarr;
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            }
           />
         </div>
       ) : (
         <div className="space-y-6 my-8">
+          {/* Judge Guide Callout */}
+          <div className="rounded-xl border border-paper-line bg-paper-warm/60 p-4 text-xs text-ink space-y-1">
+            <div className="font-semibold text-ink flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4 text-accent" />
+              <span>Judge Guide · Selective Revalidation in Action</span>
+            </div>
+            <p className="text-ink-muted leading-relaxed">
+              ProofGate automatically identified this clearance because it held a <strong>confirmed dependency</strong> on the superseded fact.
+              Click <strong>&ldquo;Re-approve with New Version&rdquo;</strong> to update the clearance certificate, or <strong>&ldquo;Send Back to Creator&rdquo;</strong> to return the copy to draft for redesign.
+            </p>
+          </div>
+
           {items.map((item) => (
             <div
               key={item.id}

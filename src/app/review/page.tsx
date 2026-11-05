@@ -7,7 +7,7 @@ import { useRole } from '@/components/ui/RoleSwitcher';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
-import { CheckCircle2, XCircle, ArrowRight, ShieldCheck, ShieldAlert, FileText, RefreshCw, MessageSquare } from 'lucide-react';
+import { CheckCircle2, XCircle, ArrowRight, ShieldCheck, ShieldAlert, FileText, RefreshCw, MessageSquare, Sparkles } from 'lucide-react';
 import type { ReviewQueueItem } from '@/server/services/clearance';
 
 export default function ReviewPage() {
@@ -216,6 +216,19 @@ export default function ReviewPage() {
                 <div className="mt-4 rounded-lg border border-line-soft bg-ink/[0.02] p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap text-ink">
                   {selectedItem.text}
                 </div>
+              </div>
+
+              {/* Judge Guide Box */}
+              <div className="rounded-xl border border-paper-line bg-paper-warm/60 p-4 text-xs text-ink space-y-1">
+                <div className="font-semibold text-ink flex items-center gap-1.5">
+                  <Sparkles className="h-4 w-4 text-accent" />
+                  <span>Judge Guide · Human Sign-off & Clearance</span>
+                </div>
+                <p className="text-ink-muted leading-relaxed">
+                  In ProofGate, <strong>AI proposes, code verifies, and humans decide</strong>.
+                  Clicking <strong>&ldquo;Approve & Create Clearance&rdquo;</strong> below mints an immutable clearance certificate
+                  locking this copy to the exact source versions that verified its claims. This dependency tree enables selective revalidation when facts change in the future.
+                </p>
               </div>
 
               {/* Reviewer Sign-off & Decision Card */}

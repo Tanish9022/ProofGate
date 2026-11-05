@@ -176,31 +176,35 @@ export default function ContentNewPage() {
 
       {/* Preset Demo Buttons */}
       <div className="mb-6 rounded-xl border border-indigo/20 bg-indigo-light/30 p-4">
-        <div className="flex items-center gap-2 mb-2 text-xs font-semibold uppercase tracking-wider text-indigo">
+        <div className="flex items-center gap-2 mb-1.5 text-xs font-semibold uppercase tracking-wider text-indigo">
           <Sparkles className="h-4 w-4" />
-          <span>Quick load demo content</span>
+          <span>Judge Guide · 1-Click Fast Start</span>
         </div>
+        <p className="text-xs text-ink-muted mb-3 leading-relaxed">
+          Select a sample below to automatically populate the form with realistic marketing copy, then click <strong>&ldquo;Check content &rarr;&rdquo;</strong>:
+        </p>
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
-            variant="secondary"
+            variant="primary"
             onClick={() => handleLoadSample('sampleA')}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
           >
-            Sample A: Launch Poster (3 issues)
+            ★ Sample A: Launch Poster (Recommended - 3 issues)
           </Button>
           <Button
             size="sm"
             variant="secondary"
             onClick={() => handleLoadSample('sampleB')}
           >
-            Sample B: Case Study (Historical)
+            Sample B: Case Study (Historical context)
           </Button>
           <Button
             size="sm"
             variant="secondary"
             onClick={() => handleLoadSample('sampleC')}
           >
-            Sample C: Blog Intro (Unverifiable)
+            Sample C: Blog Intro (Unverifiable claims)
           </Button>
           <Button
             size="sm"

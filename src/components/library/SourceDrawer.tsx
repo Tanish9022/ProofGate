@@ -474,6 +474,9 @@ export function SourceDrawer({ source, onClose, onSourceUpdated }: SourceDrawerP
                     Cancel
                   </Button>
                 </div>
+                <p className="text-[11px] text-ink-muted">
+                  * Publishing supersedes version {(source.current?.version ?? 1)} and automatically flags any dependent clearances in the Revalidation Queue.
+                </p>
               </form>
             )}
 

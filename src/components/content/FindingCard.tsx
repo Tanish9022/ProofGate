@@ -117,8 +117,8 @@ export function FindingCard({
 
       {/* Suggested Fix */}
       {finding.suggested_fix && !finding.creator_action && (
-        <div className="mt-3 rounded-lg border border-verdigris/30 bg-verdigris-light/40 p-3 text-xs">
-          <div className="flex items-center justify-between gap-2 mb-1.5">
+        <div className="mt-3 rounded-lg border border-verdigris/30 bg-verdigris-light/40 p-3 text-xs space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
             <span className="font-semibold text-verdigris flex items-center gap-1">
               <Sparkles className="h-3.5 w-3.5" />
               Suggested fix
@@ -128,12 +128,17 @@ export function FindingCard({
                 size="sm"
                 variant="secondary"
                 onClick={() => onApplyFix(finding.quote, finding.suggested_fix!)}
+                title="Click to automatically replace the contradicted text in your copy"
+                className="font-medium bg-verdigris/10 text-verdigris hover:bg-verdigris/20 border-verdigris/30"
               >
                 Apply fix
               </Button>
             )}
           </div>
-          <p className="text-ink font-mono">{finding.suggested_fix}</p>
+          <p className="text-ink font-mono font-medium">{finding.suggested_fix}</p>
+          <p className="text-[10px] text-ink-muted">
+            Clicking &ldquo;Apply fix&rdquo; automatically replaces the text and saves a new version to clear this blocker.
+          </p>
         </div>
       )}
 
@@ -146,11 +151,14 @@ export function FindingCard({
           <input
             type="text"
             required
-            placeholder="e.g. Verified with legal / intentional exception"
+            placeholder="e.g. Verified with legal counsel / approved campaign exception"
             value={dismissReason}
             onChange={e => setDismissReason(e.target.value)}
             className="w-full rounded border border-line-strong bg-paper px-2.5 py-1 text-xs text-ink"
           />
+          <p className="text-[10px] text-ink-muted">
+            A documented explanation is required to dismiss a blocker. This rationale is recorded in the permanent audit trail.
+          </p>
           <div className="flex items-center gap-2 pt-1">
             <Button
               size="sm"
@@ -158,7 +166,7 @@ export function FindingCard({
               disabled={loading || !dismissReason.trim()}
               onClick={() => handleAction('dismissed')}
             >
-              {loading ? 'Dismissing…' : 'Confirm Dismiss'}
+              {loading ? 'Dismissing…' : 'Confirm Dismiss with Reason'}
             </Button>
             <button
               onClick={() => setIsDismissing(false)}
@@ -172,26 +180,33 @@ export function FindingCard({
 
       {/* Action Buttons (when not yet resolved) */}
       {!finding.creator_action && !isDismissing && (
-        <div className="mt-3 flex items-center gap-2 pt-2 border-t border-line-soft/60">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => handleAction('accepted')}
-            disabled={loading}
-          >
-            <Check className="h-3.5 w-3.5 mr-1" />
-            Accept finding
-          </Button>
+        <div className="mt-3 pt-2 border-t border-line-soft/60">
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => handleAction('accepted')}
+              disabled={loading}
+              title="Acknowledge this finding without modifying text yet"
+            >
+              <Check className="h-3.5 w-3.5 mr-1" />
+              Accept finding
+            </Button>
 
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => setIsDismissing(true)}
-            disabled={loading}
-          >
-            <X className="h-3.5 w-3.5 mr-1 text-red-pen" />
-            Dismiss
-          </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setIsDismissing(true)}
+              disabled={loading}
+              title="Provide a justification to override this blocker"
+            >
+              <X className="h-3.5 w-3.5 mr-1 text-red-pen" />
+              Dismiss with reason
+            </Button>
+          </div>
+          <p className="text-[10px] text-ink-muted mt-1.5">
+            * All blocker findings must be resolved with &ldquo;Apply fix&rdquo; or dismissed with a documented reason before this content can be sent for review.
+          </p>
         </div>
       )}
 
