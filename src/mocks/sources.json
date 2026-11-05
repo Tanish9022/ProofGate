@@ -1,0 +1,133 @@
+[
+  {
+    "id": "src-1",
+    "kind": "fact",
+    "key": "pro_price",
+    "title": "Pro plan price",
+    "owner": "Pricing team",
+    "current": {
+      "version": 1,
+      "value": {
+        "number": 499,
+        "unit": "INR_per_user_month",
+        "display": "Rs. 499 per user per month"
+      },
+      "status": "current",
+      "validUntil": null
+    },
+    "versionCount": 1,
+    "clearanceCount": 1
+  },
+  {
+    "id": "src-2",
+    "kind": "fact",
+    "key": "trial_days",
+    "title": "Free trial length",
+    "owner": "Growth team",
+    "current": {
+      "version": 1,
+      "value": {
+        "number": 14,
+        "unit": "days",
+        "display": "14-day free trial"
+      },
+      "status": "current",
+      "validUntil": null
+    },
+    "versionCount": 1,
+    "clearanceCount": 1
+  },
+  {
+    "id": "src-3",
+    "kind": "fact",
+    "key": "uptime_sla",
+    "title": "Uptime commitment",
+    "owner": "Engineering",
+    "current": {
+      "version": 1,
+      "value": {
+        "number": 99.9,
+        "unit": "percent",
+        "display": "99.9% uptime"
+      },
+      "status": "current",
+      "validUntil": null
+    },
+    "versionCount": 1,
+    "clearanceCount": 1
+  },
+  {
+    "id": "src-4",
+    "kind": "fact",
+    "key": "festive_discount",
+    "title": "Festive annual-plan discount",
+    "owner": "Marketing",
+    "current": {
+      "version": 1,
+      "value": {
+        "number": 20,
+        "unit": "percent",
+        "display": "20% off annual plans"
+      },
+      "status": "current",
+      "validUntil": "2026-11-10"
+    },
+    "versionCount": 1,
+    "clearanceCount": 0
+  },
+  {
+    "id": "src-5",
+    "kind": "term",
+    "key": "term_banned_guaranteed",
+    "title": "No absolute guarantees",
+    "owner": "Brand team",
+    "current": {
+      "version": 1,
+      "value": {
+        "type": "banned",
+        "pattern": "guaranteed|100% secure|best in the world",
+        "message": "Avoid absolute guarantees and unprovable superlatives"
+      },
+      "status": "current",
+      "validUntil": null
+    },
+    "versionCount": 1,
+    "clearanceCount": 1
+  },
+  {
+    "id": "src-6",
+    "kind": "term",
+    "key": "term_brand_spelling",
+    "title": "Brand spelling",
+    "owner": "Brand team",
+    "current": {
+      "version": 1,
+      "value": {
+        "type": "spelling",
+        "preferred": "BrightDesk",
+        "wrong": ["Bright Desk", "Brightdesk"]
+      },
+      "status": "current",
+      "validUntil": null
+    },
+    "versionCount": 1,
+    "clearanceCount": 1
+  },
+  {
+    "id": "src-7",
+    "kind": "guideline",
+    "key": "guideline_tone",
+    "title": "Tone of voice",
+    "owner": "Brand team",
+    "current": {
+      "version": 1,
+      "value": {
+        "text": "Friendly, professional, specific. No hype."
+      },
+      "status": "current",
+      "validUntil": null
+    },
+    "versionCount": 1,
+    "clearanceCount": 1
+  }
+]

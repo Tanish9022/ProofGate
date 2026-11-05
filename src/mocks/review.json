@@ -1,0 +1,13 @@
+[
+  {
+    "id": "rev-1",
+    "content_id": "content-1",
+    "content_title": "BrightDesk Pro Promo Poster",
+    "version": 2,
+    "text": "BrightDesk Pro: now just Rs. 499 per user per month.\nTry it free for 14 days.\nBuilt for 99.9% uptime.",
+    "state": "in_review",
+    "submitted_at": "2026-11-05T10:15:00.000Z",
+    "blockersCount": 0,
+    "findingsCount": 3
+  }
+]

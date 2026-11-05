@@ -1,26 +1,125 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
+@theme {
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --color-paper: #FAFAF7;
+  --color-ink: #1A1A18;
+  --color-ink-muted: #4A4A47;
+
+  --color-verdigris: #2A9D8F;
+  --color-verdigris-light: #E6F5F3;
+
+  --color-red-pen: #E63946;
+  --color-red-pen-light: #FDECEA;
+
+  --color-amber: #E9C46A;
+  --color-amber-light: #FDF6E3;
+
+  --color-indigo: #4361EE;
+  --color-indigo-light: #EDF0FE;
+
+  --color-slate: #6B7280;
+  --color-slate-light: #F3F4F6;
+
+  --color-line-soft: #EBEBEA;
+  --color-line-strong: #D1D1CE;
+
+  --shadow-card: 0 1px 3px 0 rgba(26,26,24,0.08);
+  --shadow-drawer: -4px 0 24px 0 rgba(26,26,24,0.12);
+  --shadow-dialog: 0 8px 32px 0 rgba(26,26,24,0.16);
+
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
+
+/* ─── Design Tokens (from docs/DESIGN_SYSTEM.md) ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Fonts loaded via Google Fonts in layout.tsx */
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  /* Palette */
+  --color-paper: #FAFAF7;
+  --color-ink: #1A1A18;
+  --color-ink-muted: #4A4A47;
+
+  --color-verdigris: #2A9D8F;
+  --color-verdigris-light: #E6F5F3;
+
+  --color-red-pen: #E63946;
+  --color-red-pen-light: #FDECEA;
+
+  --color-amber: #E9C46A;
+  --color-amber-light: #FDF6E3;
+
+  --color-indigo: #4361EE;
+  --color-indigo-light: #EDF0FE;
+
+  --color-slate: #6B7280;
+  --color-slate-light: #F3F4F6;
+
+  --color-line-soft: #EBEBEA;
+  --color-line-strong: #D1D1CE;
+
+  /* Motion */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base ─── */
+html {
+  font-family: var(--font-sans);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.skip-link:focus {
+  position: static;
+  width: auto;
+  height: auto;
+}
+
+/* ─── Focus ring ─── */
+:focus-visible {
+  outline: 2px solid var(--color-indigo);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ─── Typography ─── */
+.font-serif { font-family: var(--font-serif); }
+.font-mono  { font-family: var(--font-mono); }
+
+/* Paper heading */
+h1, h2, h3 { font-family: var(--font-serif); }
+
+/* ─── Transitions ─── */
+* {
+  transition-timing-function: var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

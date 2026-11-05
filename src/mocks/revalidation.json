@@ -1,0 +1,14 @@
+[
+  {
+    "id": "reval-1",
+    "clearance_id": "clearance-1",
+    "content_id": "content-1",
+    "content_title": "BrightDesk Pro Promo Poster (v2)",
+    "reason": "Price changed Rs. 499 -> Rs. 699",
+    "status": "open",
+    "created_at": "2026-11-05T11:00:00.000Z",
+    "quote": "now just Rs. 499 per user per month",
+    "old_value": "Rs. 499 per user per month",
+    "new_value": "Rs. 699 per user per month"
+  }
+]

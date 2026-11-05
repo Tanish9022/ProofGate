@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "actor_role": "admin",
+    "action": "source.superseded",
+    "entity_type": "source",
+    "entity_id": "src-1",
+    "details": { "source_key": "pro_price", "old_version": 1, "new_version": 2 },
+    "created_at": "2026-11-05T11:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "actor_role": "reviewer",
+    "action": "clearance.approved",
+    "entity_type": "clearance",
+    "entity_id": "clearance-1",
+    "details": { "content_title": "BrightDesk Pro Promo Poster", "version": 2 },
+    "created_at": "2026-11-05T10:30:00.000Z"
+  }
+]

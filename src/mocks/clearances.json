@@ -1,0 +1,37 @@
+[
+  {
+    "id": "clearance-1",
+    "content_version_id": "cv-2",
+    "content_title": "BrightDesk Pro Promo Poster",
+    "version": 2,
+    "decision": "approved",
+    "state": "current",
+    "reviewer": "Reviewer",
+    "comment": "All checks passed against v1 sources.",
+    "decided_at": "2026-11-05T10:30:00.000Z",
+    "file_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dependencies": [
+      {
+        "source_title": "Pro plan price",
+        "version": 1,
+        "value": "Rs. 499 per user per month",
+        "link_status": "confirmed",
+        "quote": "now just Rs. 499 per user per month"
+      },
+      {
+        "source_title": "Free trial length",
+        "version": 1,
+        "value": "14-day free trial",
+        "link_status": "confirmed",
+        "quote": "free for 14 days"
+      },
+      {
+        "source_title": "Uptime commitment",
+        "version": 1,
+        "value": "99.9% uptime",
+        "link_status": "confirmed",
+        "quote": "99.9% uptime"
+      }
+    ]
+  }
+]
