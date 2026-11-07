@@ -50,7 +50,7 @@ const config: Config = {
       },
       boxShadow: {
         card: '0 1px 3px 0 rgba(26,26,24,0.08)',
-        drawer: '−4px 0 24px 0 rgba(26,26,24,0.12)',
+        drawer: '-4px 0 24px 0 rgba(26,26,24,0.12)',
         dialog: '0 8px 32px 0 rgba(26,26,24,0.16)',
       },
       transitionTimingFunction: {

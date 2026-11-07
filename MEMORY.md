@@ -37,24 +37,29 @@ The agent reads this at the start of every session and updates it at the end of 
 - [x] Block B: Source Library completed (Sources service, CRUD API, versioning, impact preview, supersede/withdraw/expire, slide-over drawer, add-version form, unit tests)
 - [x] Block C: Content & Analysis completed (Text & document extraction, Gemini claim extraction with verbatim check, deterministic checker, prompt-injection heuristic, findings persistence, two-column interactive inspection page with highlights and quick fixes, unit tests)
 - [x] Block D: Review & Clearance completed (Submit-for-review rules, review queue, human-in-the-loop approve/reject decision transactions, clearance records locking confirmed source dependencies, print certificate view, unit tests)
-- [x] Block E: Revalidation & Audit completed (Selective revalidation queue with Old vs New comparison, reapprove vs send-back flows, educational "Not Affected" historical claims section, immutable audit log table with payload inspector, unit tests)
+- [x] Block E: Revalidation & Audit completed (Selective revalidation queue with Old vs New comparison, reapprove vs send-back flows, educational "Not Affected" historical claims section, audit log table with payload inspector, unit tests)
 - [x] Block F: Harden & Polish completed (5-step interactive demo flow on Home page, real-time TopBar badge counters, responsive navigation, Playwright E2E spec)
-- Next action: Block G: Deployment verification and final checklist
+- Next action: Final incognito test and submission
 
 ## Done
 - Block A: Codebase scaffolded and verified.
 - Block B: Source library with versioning, revalidation impact preview, and Neon DB integration verified.
 - Block C: Content submission, document parsing, claim extraction pipeline, and deterministic findings verification complete. All unit tests passing.
 - Block D: Review queue, reviewer decision transaction, locked clearance dependencies, and printable clearance certificate complete. Unit tests passing.
-- Block E: Selective revalidation queue, old vs new diff view, unaffected item transparency list, immutable audit logging with search and role filters. Unit tests passing (22/22).
-- Block F: Polished 5-minute demo flow on Home page, real-time review/revalidation badge counters, Playwright E2E test setup.
+- Block E: Selective revalidation queue, old vs new diff view, unaffected item transparency list, audit logging with search and role filters. Unit tests passing (22/22).
+- Block F: Polished 5-minute demo flow on Home page, real-time review/revalidation badge counters, Playwright smoke test setup.
 
 ## Known issues
-(none yet)
+- Scanned PDFs without a text layer are not read (requires text layer or direct paste).
+- Image reading depends on Gemini vision API availability.
+- Role switcher is a demo control for judging convenience, not full authentication.
+- Demo workspaces are temporary and isolated per visitor.
+- Inline commenting threads on content versions are not built.
+- Ambiguous or unreferenced claims are marked as Unverifiable or Needs review.
 
 ## Open questions
-- Final public repo name: `proofgate`
-- Deployed Vercel URL: (pending deploy)
+- Final public repo name: `ProofGate` (https://github.com/Tanish9022/ProofGate.git)
+- Deployed Vercel URL: https://proof-gate-dusky.vercel.app/
 
 ## Glossary
 - **Source**: an approved fact, guideline, term rule or asset. Has versions.

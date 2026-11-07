@@ -3,6 +3,8 @@
 > **Verify brand and marketing content against approved facts. Keep approvals honest when facts change.**  
 > Built for **CodeNexus India 2026** (Round 2) · Problem Owner: **Inkloom AI** · Team **MANTIS** (Tanish Dhende & Khushi Kasar).
 
+🌐 **Live Demo:** [https://proof-gate-dusky.vercel.app/](https://proof-gate-dusky.vercel.app/)
+
 [![Tests](https://img.shields.io/badge/Vitest-22%2F22%20Passing-brightgreen.svg)](tests/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict%20(0%20errors)-blue.svg)](tsconfig.json)
 [![Next.js](https://img.shields.io/badge/Next.js-16.4.5%20(App%20Router)-black.svg)](https://nextjs.org/)
@@ -37,16 +39,16 @@ ProofGate includes a built-in **Interactive In-App Tour Guide** that automatical
 
 1. **Step 1: Check Marketing Copy (`/content/new`)**
    - Click **"★ Sample A: Launch Poster (Recommended - 3 issues)"**.
-   - Contains intentional discrepancies: price stated as Rs. 449, free trial as 30 days, and superlative guarantees.
+   - Contains intentional discrepancies: trial stated as 30 days (approved 14 days), uptime stated as 100% (approved 99.9%), and use of the banned guarantee term; while price Rs. 499 is supported.
 2. **Step 2: Interactive Finding Resolution (`/content/[id]`)**
    - ProofGate highlights claims inline in the document preview.
-   - Click **"Apply fix"** on the blocker cards: it automatically updates the text to approved source values (`Rs. 499 / user / month` and `14-day free trial`).
+   - Click **"Apply fix"** on the blocker cards: it automatically updates the text to approved source values (`14-day free trial` and `99.9% uptime`).
    - Click **"Dismiss with reason"** on the guarantee finding (records a documented legal override into the audit log).
    - Once all blockers are resolved, click **"Submit for Review"**.
 3. **Step 3: Independent Human Sign-off (`/review`)**
    - Switch role to **Reviewer** (or click the 1-click switcher).
    - Inspect the submission and evidence.
-   - Click **"Approve & Create Clearance"**: mints an immutable clearance certificate locking confirmed source version IDs.
+   - Click **"Approve & Create Clearance"**: creates a clearance record locking confirmed source version IDs.
 4. **Step 4: Fact Superseding in Library (`/library`)**
    - Switch role to **Admin**.
    - Open **`BrightDesk Pro Monthly`** (`brightdesk.pricing.pro_monthly`).
@@ -87,15 +89,15 @@ proofgate/
 │   ├── app/                     # Next.js 16 App Router
 │   │   ├── api/                 # Thin REST API route handlers
 │   │   │   ├── audit/           # Audit trail queries
-│   │   │   ├── clearances/      # Clearance certificates & dependencies
+│   │   │   ├── clearances/      # Clearance records & dependencies
 │   │   │   ├── content/         # Content versions, document upload, analysis
 │   │   │   ├── findings/        # Interactive creator quick-fixes & overrides
 │   │   │   ├── revalidation/    # Selective revalidation queue & resolution
 │   │   │   ├── review/          # Review queue & sign-off transactions
 │   │   │   ├── sources/         # Source library CRUD, impact preview, superseding
 │   │   │   └── workspace/       # Per-visitor workspace session & reset
-│   │   ├── audit/               # Immutable audit log page
-│   │   ├── clearances/          # Clearance certificates view
+│   │   ├── audit/               # Audit log page
+│   │   ├── clearances/          # Clearance records view
 │   │   ├── content/             # Two-column document & claim inspection workspace
 │   │   ├── library/             # Source of truth library with slide-over drawer
 │   │   ├── revalidation/        # Old vs New revalidation comparison queue
@@ -109,10 +111,10 @@ proofgate/
 │       ├── checker/             # Deterministic math, currency, unit, and terminology checker
 │       ├── db/                  # Neon serverless client, schema.sql, seedData.ts
 │       └── services/            # Business logic (sources, content, clearance, revalidate)
-└── tests/                       # Vitest unit test suites & Playwright E2E spec
+└── tests/                       # Vitest unit test suites & Playwright smoke test spec
     ├── checker.test.ts          # Deterministic rules verification
     ├── clearance.test.ts        # Reviewer sign-off & dependency locking rules
-    ├── e2e.spec.ts              # Playwright end-to-end journey
+    ├── e2e.spec.ts              # Playwright smoke test of the main pages
     ├── revalidate.test.ts       # Selective revalidation & unaffected claims isolation
     └── sources.test.ts          # Versioning, impact previews, and supersede transitions
 ```
@@ -145,12 +147,13 @@ GEMINI_MODEL=gemini-3.5-flash-lite
 APP_BASE_URL=http://localhost:3000
 RATE_LIMIT_ANALYZE_PER_HOUR=20
 ```
-*(Note: If no Gemini key is provided, ProofGate runs smoothly using its built-in deterministic fallback engine).*
+*(Note: If no Gemini key is provided or API calls fail, ProofGate runs smoothly using its built-in deterministic fallback engine).*
 
 ### 3. Database Migration & Seeding
-Initialize the PostgreSQL schema and load the demo workspace (`BrightDesk` with 7 approved sources):
+Initialize the PostgreSQL schema and load the demo workspace (`BrightDesk` with approved sources):
 ```bash
-npm run seed
+npm run db:migrate   # apply PostgreSQL database schema
+npm run seed         # populate initial demo workspace and sources
 ```
 
 ### 4. Run Development Server
@@ -163,7 +166,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser (or in an in
 
 ## 🧪 Testing & Verification
 
-ProofGate includes comprehensive unit tests covering the rules engine, dependency graph, and audit logging:
+ProofGate includes unit tests covering the rules engine, dependency graph, and audit logging:
 
 ```bash
 # Run Vitest unit tests (all 22 passing)
@@ -175,7 +178,7 @@ npx tsc --noEmit
 # Run Next.js production build
 npm run build
 
-# Run Playwright end-to-end test
+# Run Playwright smoke test
 npm run e2e
 ```
 
@@ -184,6 +187,23 @@ npm run e2e
 - **`tests/sources.test.ts`**: Verifies impact preview calculations, source version retirement, and active clearance identification.
 - **`tests/clearance.test.ts`**: Verifies blocker submission locks, human approval transactions, and confirmed dependency pointers.
 - **`tests/revalidate.test.ts`**: Verifies selective revalidation isolation, historical context exemptions, re-approval state transitions, and audit payload schemas.
+
+---
+
+## ⚠️ Known Limitations
+
+- **Scanned PDFs**: PDFs without an embedded text layer require copying and pasting text directly (OCR extraction is not embedded locally).
+- **Image Text Extraction**: Reading copy from uploaded images relies on the Gemini vision API.
+- **Role Switcher**: The role switcher is an in-browser demo control designed for evaluation without friction, not a user authentication system.
+- **Demo Workspaces**: Workspaces are isolated per visitor session and intended for evaluation and testing.
+- **Version Comments**: In-line comment threads on content versions are not implemented.
+- **Ambiguous Claims**: Unreferenced claims without an approved source match are designated as `unverifiable` or `review_needed`.
+
+---
+
+## 🛠️ Development Approach
+
+AI coding tools were used during development; `AGENTS.md` and `MEMORY.md` document instructions, architectural decisions, and progress tracking.
 
 ---
 
@@ -197,7 +217,7 @@ npm run e2e
 - **Key Architectural Decisions**:
   1. **Demo Mode & Zero-Login Wall**: Every visitor gets an isolated demo workspace via cookie `pg_ws`, enabling instant evaluation in incognito windows without signup friction.
   2. **Single Next.js Deployment**: Unified App Router API handlers and React 19 frontend—eliminating cold-start latency and multi-service failure points.
-  3. **Multi-Model Resilience Cascade**: Automated fallback across `gemini-3.5-flash-lite` $\rightarrow$ `gemini-3.1-flash-lite` $\rightarrow$ deterministic regex to guarantee 100% uptime during judging.
+  3. **Multi-Model Resilience Cascade**: Automated fallback across candidate Gemini models (`gemini-3.5-flash-lite` $\rightarrow$ `gemini-3.1-flash-lite` $\rightarrow$ `gemini-3.8-flash`) followed by deterministic regex extraction if API calls fail or are rate limited.
 
 ---
 

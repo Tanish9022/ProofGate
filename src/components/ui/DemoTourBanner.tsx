@@ -12,7 +12,7 @@ const TOUR_STEPS = [
     title: '1. Check Marketing Copy',
     role: 'creator',
     roleBadge: 'Creator',
-    desc: 'Load the sample poster to see Gemini extract claims and code flag 3 blockers.',
+    desc: 'Load the sample poster to see claims extracted and 3 blockers flagged (trial length, uptime SLA, and guarantee term).',
     href: '/content/new',
     cta: 'Check Sample Poster',
   },

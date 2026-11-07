@@ -226,7 +226,7 @@ export default function ReviewPage() {
                 </div>
                 <p className="text-ink-muted leading-relaxed">
                   In ProofGate, <strong>AI proposes, code verifies, and humans decide</strong>.
-                  Clicking <strong>&ldquo;Approve & Create Clearance&rdquo;</strong> below mints an immutable clearance certificate
+                  Clicking <strong>&ldquo;Approve & Create Clearance&rdquo;</strong> below creates a clearance record
                   locking this copy to the exact source versions that verified its claims. This dependency tree enables selective revalidation when facts change in the future.
                 </p>
               </div>

@@ -23,7 +23,7 @@ Guaranteed 100% uptime, always.`,
     text: `Over 10,000 teams trust BrightDesk to run their support desk. Bright Desk is easy to set up.`,
   },
   sampleD: {
-    title: 'Festive Email Offer',
+    title: 'Festive Offer Email',
     text: `Festive offer: get 20% off annual plans on BrightDesk Pro. Offer ends 10 November.`,
   },
   sampleE: {
@@ -205,6 +205,13 @@ export default function ContentNewPage() {
             onClick={() => handleLoadSample('sampleC')}
           >
             Sample C: Blog Intro (Unverifiable claims)
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => handleLoadSample('sampleD')}
+          >
+            Sample D: Festive Offer Email
           </Button>
           <Button
             size="sm"
