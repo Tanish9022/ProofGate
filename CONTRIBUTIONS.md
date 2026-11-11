@@ -36,3 +36,4 @@ Each entry: `Date | Person | Item | Notes`
 | 2026-11-11 | Tanish | Server-side role checks (403 on reviewer/admin routes, README demo control notice, tests) | Round 2 Fix 2 |
 | 2026-11-11 | Tanish | Idempotent approval (unique constraint, transactional check, migration, unit test) | Round 2 Fix 3 |
 | 2026-11-11 | Tanish | Playwright E2E spec (Sample A -> fixes -> review -> supersede -> revalidation & unaffected) | Round 2 Fix 4 |
+| 2026-11-11 | Tanish | Cleanup unused dependencies (removed neon.ts, @neon/config, @neon/env) | Round 2 Fix 5 |
