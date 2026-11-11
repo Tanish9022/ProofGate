@@ -1,4 +1,4 @@
--- ProofGate PostgreSQL schema
+﻿-- ProofGate PostgreSQL schema
 -- Run: psql $DATABASE_URL -f src/server/db/schema.sql  OR  npm run db:migrate
 
 create extension if not exists pgcrypto;
@@ -102,6 +102,9 @@ create table if not exists clearances (
   comment text,
   decided_at timestamptz not null default now()
 );
+
+create unique index if not exists one_clearance_per_version
+  on clearances(content_version_id);
 
 create table if not exists clearance_dependencies (
   id uuid primary key default gen_random_uuid(),

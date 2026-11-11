@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 
 describe('Block D - Review & Clearance Rules', () => {
   it('cannot submit for review if unresolved blocker findings exist', () => {
@@ -88,5 +88,65 @@ describe('Block D - Review & Clearance Rules', () => {
     expect(result.state).toBe('rejected');
     expect(result.comment).toBe('Please rephrase trial period duration.');
   });
-});
+  it('idempotent approval: double submit or retry returns existing clearance without duplicate record or audit log', () => {
+    interface Clearance {
+      id: string;
+      content_version_id: string;
+      decision: 'approved' | 'rejected';
+      state: string;
+    }
 
+    interface AuditRow {
+      id: string;
+      action: string;
+      entity_id: string;
+    }
+
+    const clearanceStore: Clearance[] = [];
+    const auditStore: AuditRow[] = [];
+
+    const decideReviewIdempotent = (
+      versionId: string,
+      decision: 'approved' | 'rejected',
+      comment: string
+    ) => {
+      // 1. Idempotency check: return existing clearance if already decided
+      const existing = clearanceStore.find(c => c.content_version_id === versionId);
+      if (existing) {
+        return { clearanceId: existing.id, state: existing.state, createdNew: false };
+      }
+
+      // 2. Create new clearance
+      const newClearance: Clearance = {
+        id: `cl-${clearanceStore.length + 1}`,
+        content_version_id: versionId,
+        decision,
+        state: decision === 'approved' ? 'current' : 'rejected',
+      };
+      clearanceStore.push(newClearance);
+
+      // 3. Write audit log
+      auditStore.push({
+        id: `aud-${auditStore.length + 1}`,
+        action: `clearance.${decision}`,
+        entity_id: newClearance.id,
+      });
+
+      return { clearanceId: newClearance.id, state: newClearance.state, createdNew: true };
+    };
+
+    // First submit: creates clearance
+    const firstCall = decideReviewIdempotent('ver-101', 'approved', 'Looks good');
+    expect(firstCall.createdNew).toBe(true);
+    expect(firstCall.clearanceId).toBe('cl-1');
+    expect(clearanceStore.length).toBe(1);
+    expect(auditStore.length).toBe(1);
+
+    // Second submit (retry / double-click): idempotent, no duplicate clearance or audit entry
+    const retryCall = decideReviewIdempotent('ver-101', 'approved', 'Looks good');
+    expect(retryCall.createdNew).toBe(false);
+    expect(retryCall.clearanceId).toBe('cl-1');
+    expect(clearanceStore.length).toBe(1); // Still exactly 1 clearance
+    expect(auditStore.length).toBe(1);     // Still exactly 1 audit row
+  });
+});
