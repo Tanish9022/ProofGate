@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('Block D - Review & Clearance Rules', () => {
   it('cannot submit for review if unresolved blocker findings exist', () => {

@@ -1,4 +1,4 @@
-﻿import crypto from 'crypto';
+import crypto from 'crypto';
 import { db } from '@/server/db/client';
 import { extractClaims } from '@/server/ai/gemini';
 import { runDeterministicChecks, SourceLookup, ComputedFinding } from '@/server/checker/checker';
