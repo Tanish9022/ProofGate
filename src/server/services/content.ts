@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+﻿import crypto from 'crypto';
 import { db } from '@/server/db/client';
 import { extractClaims } from '@/server/ai/gemini';
 import { runDeterministicChecks, SourceLookup, ComputedFinding } from '@/server/checker/checker';
@@ -551,3 +551,90 @@ export async function updateFinding(
   );
 }
 
+
+
+export interface CommentRow {
+  id: string;
+  workspace_id: string;
+  content_version_id: string;
+  finding_id: string | null;
+  author_role: string;
+  body: string;
+  created_at: string;
+}
+
+/**
+ * Add a comment to a content version
+ */
+export async function addComment(
+  workspaceId: string,
+  contentId: string,
+  versionId: string,
+  authorRole: string,
+  body: string,
+  findingId?: string | null
+): Promise<CommentRow> {
+  const cleanBody = body.trim();
+  if (!cleanBody) throw new Error('Comment cannot be empty.');
+  if (cleanBody.length > 500) throw new Error('Comment exceeds 500 characters.');
+
+  // Validate version belongs to content & workspace
+  const ver = await db<{ id: string; version: number }>(
+    `SELECT id, version FROM content_versions WHERE id = $1 AND content_id = $2 AND workspace_id = $3`,
+    [versionId, contentId, workspaceId]
+  );
+  if (ver.length === 0) {
+    throw new Error('Content version not found in this workspace.');
+  }
+
+  const rows = await db<CommentRow>(
+    `INSERT INTO comments (workspace_id, content_version_id, finding_id, author_role, body)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, workspace_id, content_version_id, finding_id, author_role, body, created_at`,
+    [workspaceId, versionId, findingId || null, authorRole, cleanBody]
+  );
+
+  const comment = rows[0];
+
+  await db(
+    `INSERT INTO audit_log (workspace_id, actor_role, action, entity_type, entity_id, details)
+     VALUES ($1, $2, 'comment.created', 'comment', $3, $4)`,
+    [
+      workspaceId,
+      authorRole,
+      comment.id,
+      JSON.stringify({ contentId, versionId, version: ver[0].version, findingId: findingId || null }),
+    ]
+  );
+
+  return comment;
+}
+
+/**
+ * List comments for a content item or specific version
+ */
+export async function getComments(
+  workspaceId: string,
+  contentId: string,
+  versionId?: string
+): Promise<CommentRow[]> {
+  if (versionId) {
+    return await db<CommentRow>(
+      `SELECT c.id, c.workspace_id, c.content_version_id, c.finding_id, c.author_role, c.body, c.created_at
+       FROM comments c
+       JOIN content_versions cv ON cv.id = c.content_version_id
+       WHERE cv.content_id = $1 AND c.content_version_id = $2 AND c.workspace_id = $3
+       ORDER BY c.created_at ASC`,
+      [contentId, versionId, workspaceId]
+    );
+  }
+
+  return await db<CommentRow>(
+    `SELECT c.id, c.workspace_id, c.content_version_id, c.finding_id, c.author_role, c.body, c.created_at
+     FROM comments c
+     JOIN content_versions cv ON cv.id = c.content_version_id
+     WHERE cv.content_id = $1 AND c.workspace_id = $2
+     ORDER BY c.created_at ASC`,
+    [contentId, workspaceId]
+  );
+}

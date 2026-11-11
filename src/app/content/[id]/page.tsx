@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useMemo, use } from 'react';
 import Link from 'next/link';
@@ -8,6 +8,7 @@ import { Seal } from '@/components/ui/StatusChip';
 import { useToast } from '@/components/ui/Toast';
 import { HighlightedText } from '@/components/content/HighlightedText';
 import { FindingCard } from '@/components/content/FindingCard';
+import { CommentSection } from '@/components/content/CommentSection';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -422,6 +423,13 @@ export default function ContentDetailPage({
               </div>
             </div>
           )}
+
+          {/* Version Comments */}
+          <CommentSection
+            contentId={contentId}
+            versionId={activeVer.id}
+            currentRole={role}
+          />
         </section>
 
         {/* Right Column: Findings Inspector */}

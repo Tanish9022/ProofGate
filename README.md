@@ -1,4 +1,4 @@
-# ProofGate
+﻿# ProofGate
 
 > **Verify brand and marketing content against approved facts. Keep approvals honest when facts change.**  
 > Built for **CodeNexus India 2026** (Round 2) · Problem Owner: **Inkloom AI** · Team **MANTIS** (Tanish Dhende & Khushi Kasar).
@@ -196,7 +196,7 @@ npm run e2e
 - **Image Text Extraction**: Reading copy from uploaded images relies on the Gemini vision API.
 - **Role Switcher**: The role switcher is an in-browser demo control designed for evaluation without friction, not a user authentication system.
 - **Demo Workspaces**: Workspaces are isolated per visitor session and intended for evaluation and testing.
-- **Version Comments**: In-line comment threads on content versions are not implemented.
+- **Version Comments**: Version-scoped comments are fully supported with role tracking and audit logs; arbitrary in-line text range commenting threads are not built.
 - **Ambiguous Claims**: Unreferenced claims without an approved source match are designated as `unverifiable` or `review_needed`.
 
 ---

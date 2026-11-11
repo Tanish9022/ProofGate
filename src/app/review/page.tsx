@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
 import { CheckCircle2, XCircle, ArrowRight, ShieldCheck, ShieldAlert, FileText, RefreshCw, MessageSquare, Sparkles } from 'lucide-react';
 import type { ReviewQueueItem } from '@/server/services/clearance';
+import { CommentSection } from '@/components/content/CommentSection';
 
 export default function ReviewPage() {
   const router = useRouter();
@@ -230,6 +231,13 @@ export default function ReviewPage() {
                   locking this copy to the exact source versions that verified its claims. This dependency tree enables selective revalidation when facts change in the future.
                 </p>
               </div>
+
+              {/* Version Comments */}
+              <CommentSection
+                contentId={selectedItem.contentId}
+                versionId={selectedItem.versionId}
+                currentRole={role}
+              />
 
               {/* Reviewer Sign-off & Decision Card */}
               <div className="rounded-xl border border-line-soft bg-paper p-6 shadow-sm space-y-4">
