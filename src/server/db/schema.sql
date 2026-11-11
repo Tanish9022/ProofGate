@@ -1,4 +1,4 @@
-﻿-- ProofGate PostgreSQL schema
+-- ProofGate PostgreSQL schema
 -- Run: psql $DATABASE_URL -f src/server/db/schema.sql  OR  npm run db:migrate
 
 create extension if not exists pgcrypto;
@@ -162,3 +162,20 @@ create table if not exists rate_limit_log (
 
 create index if not exists rate_limit_log_ws_action_time
   on rate_limit_log(workspace_id, action, created_at);
+
+create table if not exists evaluation_runs (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null,
+  mode text not null check (mode in ('deterministic', 'gemini')),
+  as_of_date timestamptz not null default now(),
+  dataset text not null default 'detection',
+  cases_count integer not null,
+  passed_count integer not null,
+  failed_count integer not null,
+  metrics jsonb not null,
+  results jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists evaluation_runs_ws_created
+  on evaluation_runs(workspace_id, created_at desc);

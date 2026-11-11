@@ -1,0 +1,52 @@
+[
+  {
+    "id": "REV-001",
+    "description": "Current price claim approved → price source superseded → REOPEN",
+    "should_reopen": true
+  },
+  {
+    "id": "REV-003",
+    "description": "99.9% uptime confirmed → SLA changes → REOPEN",
+    "should_reopen": true
+  },
+  {
+    "id": "REV-004",
+    "description": "Probable uptime link (not confirmed by reviewer) → SLA changes → NO REOPEN",
+    "should_reopen": false
+  },
+  {
+    "id": "REV-005",
+    "description": "Banned term dismissed with reason → term rule withdrawn → REOPEN",
+    "should_reopen": true
+  },
+  {
+    "id": "REV-006",
+    "description": "Spelling error confirmed → term superseded → REOPEN",
+    "should_reopen": true
+  },
+  {
+    "id": "REV-007",
+    "description": "Historical mention of old price → new price published → NO REOPEN",
+    "should_reopen": false
+  },
+  {
+    "id": "REV-008",
+    "description": "Quoted competitor price → source changes → NO REOPEN",
+    "should_reopen": false
+  },
+  {
+    "id": "REV-009",
+    "description": "Two confirmed deps → one source superseded → REOPEN",
+    "should_reopen": true
+  },
+  {
+    "id": "REV-013",
+    "description": "Annual price (probable) → monthly source superseded → NO REOPEN",
+    "should_reopen": false
+  },
+  {
+    "id": "REV-025",
+    "description": "Image palette clearance → palette source changed → REOPEN (Improvement 2)",
+    "should_reopen": true
+  }
+]
