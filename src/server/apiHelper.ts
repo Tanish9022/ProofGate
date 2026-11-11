@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getWorkspace } from '@/server/services/workspace';
+﻿import { NextRequest, NextResponse } from 'next/server';
 
 export type UserRole = 'admin' | 'creator' | 'reviewer';
 
@@ -10,7 +9,8 @@ export interface RequestContext {
 
 /**
  * Resolves the workspace ID from cookie `pg_ws` and role from header `x-role`.
- * Throws a NextResponse 400/401 if missing or invalid.
+ * Enforces strict role checks when requiredRole is specified.
+ * Returns 403 with a clear message if role does not match.
  */
 export async function getRequestContext(
   request: NextRequest,
@@ -30,25 +30,17 @@ export async function getRequestContext(
     ? roleHeader
     : 'creator';
 
-  if (requiredRole) {
-    const isAllowed =
-      role === requiredRole ||
-      (requiredRole === 'reviewer' && role === 'admin') ||
-      (requiredRole === 'creator' && (role === 'admin' || role === 'creator'));
-
-    if (!isAllowed) {
-      return NextResponse.json(
-        {
-          error: {
-            code: 'forbidden',
-            message: `This action requires the '${requiredRole}' role (current role: '${role}')`,
-          },
+  if (requiredRole && role !== requiredRole) {
+    return NextResponse.json(
+      {
+        error: {
+          code: 'forbidden',
+          message: `Forbidden: this action requires '${requiredRole}' privileges (current role: '${role}'). Note: x-role header is a demo control, not authentication.`,
         },
-        { status: 403 }
-      );
-    }
+      },
+      { status: 403 }
+    );
   }
 
   return { workspaceId: wsCookie, role };
 }
-

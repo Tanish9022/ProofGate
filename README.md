@@ -194,7 +194,7 @@ npm run e2e
 
 - **Scanned PDFs**: PDFs without an embedded text layer require copying and pasting text directly (OCR extraction is not embedded locally).
 - **Image Text Extraction**: Reading copy from uploaded images relies on the Gemini vision API.
-- **Role Switcher**: The role switcher is an in-browser demo control designed for evaluation without friction, not a user authentication system.
+- **Role Switcher & x-role Header**: The role switcher and x-role request header are in-browser demo controls for judging convenience, not authentication. Server-side routes strictly enforce 403 authorization checks (approve/reject only for Reviewer, add-version/withdraw/expire only for Admin).
 - **Demo Workspaces**: Workspaces are isolated per visitor session and intended for evaluation and testing.
 - **Version Comments**: Version-scoped comments are fully supported with role tracking and audit logs; arbitrary in-line text range commenting threads are not built.
 - **Ambiguous Claims**: Unreferenced claims without an approved source match are designated as `unverifiable` or `review_needed`.
