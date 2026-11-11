@@ -53,13 +53,49 @@ export function extractClaimsFallback(
 ): { claims: ExtractedClaim[]; injectionSuspected: boolean } {
   const claims: ExtractedClaim[] = [];
 
-  // Price match: e.g. "Rs. 499 per user per month" or "Rs. 499"
-  const priceRegex = /(?:Rs\.?|INR)\s*(\d+(?:,\d+)*(?:\.\d+)?)(?:\s*(?:per\s+user\s+per\s+month|\/user\/month|per\s+user\s+monthly))?/gi;
+  // Helper to determine context from surrounding text
+  const getContextForMatch = (start: number, end: number, quote: string): 'current' | 'historical' | 'quoted' | 'hypothetical' => {
+    const sStart = Math.max(0, start - 80);
+    const sEnd = Math.min(text.length, end + 80);
+    const surrounding = text.slice(sStart, sEnd).toLowerCase();
+
+    if (/\b(?:according to|said|stated|claims?|reported|quoted)\b/i.test(surrounding) || (surrounding.includes('"') && (surrounding.includes('cto') || surrounding.includes('said')))) {
+      return 'quoted';
+    }
+    if (/\b(?:in (?:19\d\d|20[0-2]\d)|last (?:year|quarter|month)|previously|was paying|was priced|was extended|were paying|used to|earlier|historically|prior to|back in|before switching|before the price)\b/i.test(surrounding)) {
+      return 'historical';
+    }
+    if (/\b(?:if|could be|assuming|imagine|projected|hypothetically|suppose|would you)\b/i.test(surrounding)) {
+      return 'hypothetical';
+    }
+    return 'current';
+  };
+
+  // 1. Annual price match: e.g. "Rs. 5988 per year" or "Rs. 5,988 billed once per year"
+  const annualPriceRegex = /(?:Rs\.?|INR)\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:(?:billed\s+once\s+)?per\s+year(?:\s+per\s+user)?|annual(?:\s+subscription)?)/gi;
   let match: RegExpExecArray | null;
-  while ((match = priceRegex.exec(text)) !== null) {
+  while ((match = annualPriceRegex.exec(text)) !== null) {
     const rawQuote = match[0];
     const num = parseFloat(match[1].replace(/,/g, ''));
-    const isPerUserMonth = /user/i.test(rawQuote);
+    claims.push({
+      quote: rawQuote,
+      start_idx: match.index,
+      end_idx: match.index + rawQuote.length,
+      fact_key: 'pro_price',
+      number: num,
+      unit: 'INR_per_year',
+      context: getContextForMatch(match.index, match.index + rawQuote.length, rawQuote),
+    });
+  }
+
+  // 2. Monthly / regular Price match: e.g. "Rs. 499 per user per month", "Rs. 499", "Rs. 499.00"
+  const priceRegex = /(?:Rs\.?|INR)\s*(\d+(?:,\d+)*(?:\.\d+)?)(?:\s*(?:per\s+(?:user|person|seat)\s+(?:per\s+month|each\s+month|monthly)|\/user\/month|monthly\s+per\s+seat|total\s+for\s+up\s+to\s+\d+\s+users\s+per\s+month|and\s+unlock\s+unlimited\s+users\s+per\s+month))?/gi;
+  while ((match = priceRegex.exec(text)) !== null) {
+    const rawQuote = match[0];
+    // Skip if already captured by annual price
+    if (claims.some(c => match!.index >= c.start_idx && match!.index < c.end_idx)) continue;
+    const num = parseFloat(match[1].replace(/,/g, ''));
+    const isPerUserMonth = /user|person|seat|month/i.test(rawQuote);
     claims.push({
       quote: rawQuote,
       start_idx: match.index,
@@ -67,37 +103,54 @@ export function extractClaimsFallback(
       fact_key: 'pro_price',
       number: num,
       unit: isPerUserMonth ? 'INR_per_user_month' : 'INR',
-      context: 'current',
+      context: getContextForMatch(match.index, match.index + rawQuote.length, rawQuote),
     });
   }
 
-  // Days match: e.g. "30 days" or "14 days"
-  const daysRegex = /(\d+)[-\s]days?(?:\s+free\s+trial)?/gi;
+  // 3. Days match: e.g. "30 days", "14 days", "14-day free trial", "fourteen-day"
+  const daysRegex = /(?:(\d+)|fourteen)[-\s]days?(?:\s+(?:free\s+)?trial)?/gi;
   while ((match = daysRegex.exec(text)) !== null) {
     const rawQuote = match[0];
+    const num = match[1] ? parseInt(match[1], 10) : 14;
     claims.push({
       quote: rawQuote,
       start_idx: match.index,
       end_idx: match.index + rawQuote.length,
       fact_key: 'trial_days',
-      number: parseInt(match[1], 10),
+      number: num,
       unit: 'days',
-      context: 'current',
+      context: getContextForMatch(match.index, match.index + rawQuote.length, rawQuote),
     });
   }
 
-  // Percent match: e.g. "99.9% uptime" or "20% off"
-  const percentRegex = /(\d+(?:\.\d+)?)\s*%(?:\s+uptime|\s+off)?/gi;
+  // 4. Percent match: e.g. "99.9% uptime", "20% off", "20 percent", "ninety-nine point nine percent"
+  const percentRegex = /(?:(\d+(?:\.\d+)?)\s*(?:%|percent)|ninety-nine point nine percent)(?:\s+uptime|\s+off)?/gi;
   while ((match = percentRegex.exec(text)) !== null) {
     const rawQuote = match[0];
-    const isUptime = /uptime/i.test(rawQuote);
+    const isUptime = /uptime|ninety/i.test(rawQuote) || /uptime/i.test(text);
+    const num = match[1] ? parseFloat(match[1]) : 99.9;
     claims.push({
       quote: rawQuote,
       start_idx: match.index,
       end_idx: match.index + rawQuote.length,
       fact_key: isUptime ? 'uptime_sla' : 'festive_discount',
-      number: parseFloat(match[1]),
+      number: num,
       unit: 'percent',
+      context: getContextForMatch(match.index, match.index + rawQuote.length, rawQuote),
+    });
+  }
+
+  // 5. Unverifiable generic claims (counts, operating years)
+  const genericCountRegex = /(?:over\s+\d+(?:,\d+)*\s+teams|operating\s+for\s+\d+\s+years|best\s+support\s+team)/gi;
+  while ((match = genericCountRegex.exec(text)) !== null) {
+    const rawQuote = match[0];
+    claims.push({
+      quote: rawQuote,
+      start_idx: match.index,
+      end_idx: match.index + rawQuote.length,
+      fact_key: null,
+      number: null,
+      unit: null,
       context: 'current',
     });
   }

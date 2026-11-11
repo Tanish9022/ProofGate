@@ -14,6 +14,7 @@ create table if not exists sources (
   workspace_id uuid not null references workspaces(id) on delete cascade,
   kind text not null check (kind in ('fact','term','guideline','asset')),
   key text not null,
+  fact_key text,
   title text not null,
   owner text not null,
   created_at timestamptz not null default now(),

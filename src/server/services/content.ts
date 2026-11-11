@@ -405,7 +405,7 @@ export async function analyzeContentVersion(
 
   // 2. Fetch all current sources in workspace
   const sources = await db<SourceLookup>(
-    `SELECT sv.id, s.id as source_id, s.kind, s.key, s.title, sv.version, sv.value, sv.status
+    `SELECT sv.id, s.id as source_id, s.kind, s.key, s.fact_key, s.title, sv.version, sv.value, sv.status, sv.effective_from, sv.valid_until
      FROM source_versions sv
      JOIN sources s ON s.id = sv.source_id
      WHERE s.workspace_id = $1 AND sv.status = 'current'`,
