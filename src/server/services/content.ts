@@ -638,3 +638,48 @@ export async function getComments(
     [contentId, workspaceId]
   );
 }
+
+/**
+ * Reviewer confirms a probable link, elevating it to confirmed dependency
+ */
+export async function confirmProbableLink(
+  workspaceId: string,
+  findingId: string,
+  actor: string = 'reviewer'
+): Promise<void> {
+  await db(
+    `UPDATE findings
+     SET link_status = 'confirmed'
+     WHERE id = $1 AND workspace_id = $2`,
+    [findingId, workspaceId]
+  );
+
+  await db(
+    `INSERT INTO audit_log (workspace_id, actor_role, action, entity_type, entity_id, details)
+     VALUES ($1, $2, 'finding.link_confirmed', 'finding', $3, $4)`,
+    [workspaceId, actor, findingId, JSON.stringify({ link_status: 'confirmed' })]
+  );
+}
+
+/**
+ * Reviewer rejects a probable link so it will never create a clearance dependency
+ */
+export async function rejectProbableLink(
+  workspaceId: string,
+  findingId: string,
+  reason?: string,
+  actor: string = 'reviewer'
+): Promise<void> {
+  await db(
+    `UPDATE findings
+     SET link_status = NULL, dismiss_reason = $1
+     WHERE id = $2 AND workspace_id = $3`,
+    [reason?.trim() || null, findingId, workspaceId]
+  );
+
+  await db(
+    `INSERT INTO audit_log (workspace_id, actor_role, action, entity_type, entity_id, details)
+     VALUES ($1, $2, 'finding.link_rejected', 'finding', $3, $4)`,
+    [workspaceId, actor, findingId, JSON.stringify({ reason })]
+  );
+}

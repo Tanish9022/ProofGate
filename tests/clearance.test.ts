@@ -149,4 +149,55 @@ describe('Block D - Review & Clearance Rules', () => {
     expect(clearanceStore.length).toBe(1); // Still exactly 1 clearance
     expect(auditStore.length).toBe(1);     // Still exactly 1 audit row
   });
+
+  it('unconfirmed probable links do not create dependencies and never reopen on source changes', () => {
+    interface ClearanceDep {
+      clearance_id: string;
+      source_version_id: string;
+      link_status: 'confirmed' | 'probable';
+    }
+
+    // 1. Initial findings: one confirmed (499 price), one unconfirmed probable (uptime qualifier)
+    const findings = [
+      { id: 'f-1', source_version_id: 'sv-price-v1', link_status: 'confirmed' as const },
+      { id: 'f-2', source_version_id: 'sv-uptime-v1', link_status: 'probable' as const },
+    ];
+
+    // 2. During clearance approval, only confirmed links become clearance dependencies
+    const lockedDeps: ClearanceDep[] = findings
+      .filter(f => f.link_status === 'confirmed')
+      .map(f => ({
+        clearance_id: 'cl-1',
+        source_version_id: f.source_version_id,
+        link_status: f.link_status,
+      }));
+
+    expect(lockedDeps.length).toBe(1);
+    expect(lockedDeps[0].source_version_id).toBe('sv-price-v1');
+
+    // 3. When uptime source sv-uptime-v1 is superseded by sv-uptime-v2
+    const triggerSourceId = 'sv-uptime-v1';
+    const revalidationNeeded = lockedDeps.some(
+      dep => dep.source_version_id === triggerSourceId && dep.link_status === 'confirmed'
+    );
+
+    // Unconfirmed probable link does NOT trigger revalidation!
+    expect(revalidationNeeded).toBe(false);
+
+    // 4. If reviewer explicitly confirms the probable link before approval
+    findings[1].link_status = 'confirmed';
+    const updatedLockedDeps: ClearanceDep[] = findings
+      .filter(f => f.link_status === 'confirmed')
+      .map(f => ({
+        clearance_id: 'cl-2',
+        source_version_id: f.source_version_id,
+        link_status: f.link_status,
+      }));
+
+    expect(updatedLockedDeps.length).toBe(2);
+    const revalidationAfterConfirmation = updatedLockedDeps.some(
+      dep => dep.source_version_id === triggerSourceId && dep.link_status === 'confirmed'
+    );
+    expect(revalidationAfterConfirmation).toBe(true);
+  });
 });

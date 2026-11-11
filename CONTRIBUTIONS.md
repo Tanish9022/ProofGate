@@ -38,3 +38,4 @@ Each entry: `Date | Person | Item | Notes`
 | 2026-11-11 | Tanish | Playwright E2E spec (Sample A -> fixes -> review -> supersede -> revalidation & unaffected) | Round 2 Fix 4 |
 | 2026-11-11 | Tanish | Cleanup unused dependencies (removed neon.ts, @neon/config, @neon/env) | Round 2 Fix 5 |
 | 2026-11-11 | Tanish | Improvement 1 Part A: Checker upgrades (asOfDate, number words, fact_key migration, qualifiers, context rules, tests) | Imp 1 Part A |
+| 2026-11-11 | Tanish | Improvement 1 Part B: Probable links queue (confirm/reject endpoints, audit logs, review UI, dependency isolation test) | Imp 1 Part B |

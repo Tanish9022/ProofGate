@@ -7,9 +7,21 @@ import { useRole } from '@/components/ui/RoleSwitcher';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
-import { CheckCircle2, XCircle, ArrowRight, ShieldCheck, ShieldAlert, FileText, RefreshCw, MessageSquare, Sparkles } from 'lucide-react';
+import { CheckCircle2, XCircle, ArrowRight, ShieldCheck, ShieldAlert, FileText, RefreshCw, MessageSquare, Sparkles, HelpCircle, Check, X, Link as LinkIcon } from 'lucide-react';
 import type { ReviewQueueItem } from '@/server/services/clearance';
 import { CommentSection } from '@/components/content/CommentSection';
+
+interface ReviewFinding {
+  id: string;
+  quote: string;
+  status: string;
+  severity: string;
+  source_title: string | null;
+  source_version: number | null;
+  source_display: string | null;
+  explanation: string;
+  link_status: 'confirmed' | 'probable' | null;
+}
 
 export default function ReviewPage() {
   const router = useRouter();
@@ -23,6 +35,66 @@ export default function ReviewPage() {
   // Decision state
   const [comment, setComment] = useState('');
   const [isDeciding, setIsDeciding] = useState(false);
+
+  // Findings state for selected item
+  const [findings, setFindings] = useState<ReviewFinding[]>([]);
+  const [loadingFindings, setLoadingFindings] = useState(false);
+
+  useEffect(() => {
+    if (!selectedItem) {
+      setFindings([]);
+      return;
+    }
+    const loadFindings = async () => {
+      setLoadingFindings(true);
+      try {
+        const res = await fetch(`/api/content/${selectedItem.contentId}?version=${selectedItem.version}`);
+        if (res.ok) {
+          const data = await res.json();
+          setFindings(data.latestVersion?.findings || []);
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoadingFindings(false);
+      }
+    };
+    loadFindings();
+  }, [selectedItem]);
+
+  const handleConfirmLink = async (findingId: string) => {
+    try {
+      const res = await fetch(`/api/findings/${findingId}/confirm-link`, {
+        method: 'POST',
+        headers: { 'x-role': role },
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error?.message || 'Failed to confirm link');
+      }
+      showToast('Link confirmed as dependency', 'success');
+      setFindings(prev => prev.map(f => f.id === findingId ? { ...f, link_status: 'confirmed' } : f));
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Error confirming link', 'error');
+    }
+  };
+
+  const handleRejectLink = async (findingId: string) => {
+    try {
+      const res = await fetch(`/api/findings/${findingId}/reject-link`, {
+        method: 'POST',
+        headers: { 'x-role': role },
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error?.message || 'Failed to reject link');
+      }
+      showToast('Link rejected (will not create dependency)', 'info');
+      setFindings(prev => prev.map(f => f.id === findingId ? { ...f, link_status: null } : f));
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Error rejecting link', 'error');
+    }
+  };
 
   const fetchQueue = async () => {
     setLoading(true);
@@ -231,6 +303,93 @@ export default function ReviewPage() {
                   locking this copy to the exact source versions that verified its claims. This dependency tree enables selective revalidation when facts change in the future.
                 </p>
               </div>
+
+              {/* Needs Confirming / Probable Dependency Links */}
+              {findings.some(f => f.link_status === 'probable') && (
+                <div className="rounded-xl border border-amber-300 bg-amber-50/70 p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="h-5 w-5 text-amber-600" />
+                      <h3 className="font-serif text-base font-semibold text-ink">
+                        Needs Confirming · Probable Dependency Links ({findings.filter(f => f.link_status === 'probable').length})
+                      </h3>
+                    </div>
+                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-amber-200/80 text-amber-900 font-medium">
+                      Requires human confirmation
+                    </span>
+                  </div>
+                  <p className="text-xs text-ink-muted">
+                    Deterministic checks identified these claims as probable links (e.g. derived calculation, unit mismatch, or qualifier). <strong>They will NOT create clearance dependencies or auto-revalidate unless confirmed by you.</strong>
+                  </p>
+
+                  <div className="space-y-2.5 pt-1">
+                    {findings.filter(f => f.link_status === 'probable').map(f => (
+                      <div
+                        key={f.id}
+                        className="rounded-lg border border-amber-200 bg-paper p-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-xs text-ink">&ldquo;{f.quote}&rdquo;</span>
+                            {f.source_title && (
+                              <span className="text-[11px] font-mono text-ink-muted">
+                                → {f.source_title} (v{f.source_version})
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-ink-muted leading-relaxed">
+                            {f.explanation}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Button
+                            size="sm"
+                            onClick={() => handleConfirmLink(f.id)}
+                            className="bg-verdigris hover:bg-verdigris/90 text-white text-xs py-1 h-8"
+                          >
+                            <Check className="h-3.5 w-3.5 mr-1" />
+                            Confirm Link
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleRejectLink(f.id)}
+                            className="text-xs py-1 h-8 hover:bg-ink/[0.04]"
+                          >
+                            <X className="h-3.5 w-3.5 mr-1" />
+                            Reject Link
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Confirmed Dependencies Preview */}
+              {findings.some(f => f.link_status === 'confirmed') && (
+                <div className="rounded-xl border border-line-soft bg-paper p-4 text-xs space-y-2">
+                  <div className="flex items-center gap-2 font-semibold text-ink">
+                    <LinkIcon className="h-4 w-4 text-verdigris" />
+                    <span>Confirmed Dependencies ({findings.filter(f => f.link_status === 'confirmed').length})</span>
+                  </div>
+                  <p className="text-ink-muted">
+                    These approved claims have code-verified links and will automatically lock to their source versions upon approval.
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {findings.filter(f => f.link_status === 'confirmed').map(f => (
+                      <span
+                        key={f.id}
+                        className="font-mono text-[11px] px-2.5 py-1 rounded-md bg-verdigris/10 text-ink border border-verdigris/20 flex items-center gap-1.5"
+                      >
+                        <CheckCircle2 className="h-3 w-3 text-verdigris" />
+                        <span>{f.source_title || f.quote}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Version Comments */}
               <CommentSection
