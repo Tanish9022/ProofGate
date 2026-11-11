@@ -65,3 +65,49 @@ npm run e2e        # one Playwright test for the main flow
 
 ## When unsure
 Choose the smaller option that keeps the main flow working, write the decision in MEMORY.md, and continue.
+
+---
+
+## Round 3 Rules (CodeNexus India 2026 — Round 3 window: 10–13 Nov 2026)
+
+### Standing rules — repeat these if the agent drifts
+- **AI proposes, code decides, humans approve.** No model output sets a finding status for numeric facts.
+- **Zod on every input and every model output.** No exceptions.
+- **Every mutation writes a row to udit_log.** This includes comments, confirms, rejects, source versions, clearance decisions, and revalidation resolutions.
+- **Workspace isolation on every query.** Every DB read/write includes WHERE workspace_id = . Never query across workspaces.
+- **The app must keep working with Gemini off.** Every AI-dependent feature must degrade gracefully with a clear "unavailable without AI" state. Never show fake results.
+- **No secrets in the repo.** Never read, print, or modify .env.local or any .env.* file. Use Vercel env vars. Keep .env.example current.
+- **Database changes go in a new idempotent migration.** Use CREATE TABLE IF NOT EXISTS / ADD COLUMN IF NOT EXISTS. Never destructive. Place in src/server/db/migrations/ with a timestamp prefix. Document the exact command to apply it.
+- **
+pm run build and 
+pm run test must pass before each push.**
+- **Small commits with honest messages.** Commit after each logical unit of work. Do not batch unrelated changes.
+- **Add a dated line to CONTRIBUTIONS.md for every finished item.**
+- **Never show a number you did not measure.** If a metric cannot be computed, say so explicitly. No invented precision, recall, or F1 values.
+
+### Three Round 3 Improvements (must deliver exactly these)
+1. **Context-aware dependency linking with a measured precision report** — probable links, needs-confirming queue, deterministic context rules, gold evaluation set (60+ cases), /evaluation page with real metrics.
+2. **Visual brand and accessibility checks for images** — asset source kind, Gemini vision + code measurement pipeline, contrast/palette/logo findings, overlay UI, image clearances with revalidation.
+3. **Governance insights and rule clarification** — /insights page (6+ metrics), sample history, unclear-rule detector, Gemini-drafted clarification + code what-if, admin approval via existing versioning.
+
+### New database migrations (Round 3)
+- Always create a new file in src/server/db/migrations/ named YYYYMMDD_description.sql.
+- Apply with: 
+px tsx src/server/db/migrate.ts (re-runs are safe; use IF NOT EXISTS).
+- Update src/server/db/schema.sql to reflect the final schema state after migration.
+
+### Evaluation runner rules
+- Run every gold case through the SAME production functions (checker.ts, gemini.ts, sources service). No test-specific code paths, no input recognition.
+- Record for each case: id, gold label, observed result, status, source and version shown, pass/fail.
+- Store each run in the evaluation_runs table with timestamp, mode (deterministic/gemini), as-of date, per-case JSON, metrics JSON.
+- Report precision, recall, F1 with sample size next to every percentage.
+- Never tune the product to specific test inputs.
+
+### Cut lines (cut from bottom first)
+- Gemini-mode evaluation
+- Trend chart on /insights
+- Mobile polish of image overlay
+- Suggestion generation (keep detector and metrics)
+- Logo distortion detection (keep palette and contrast)
+
+**Never cut:** Round 2 fixes, probable-link queue, /evaluation page, contrast and palette checks, /insights metrics.
