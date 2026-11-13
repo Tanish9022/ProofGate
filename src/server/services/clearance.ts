@@ -203,11 +203,18 @@ export async function decideReview(
 
   const newState = decision === 'approved' ? 'current' : 'rejected';
 
-  // 2. Insert into clearances
+  // 2. Upsert into clearances (safe against re-reviews of the same version)
   const clearanceRows = await db<{ id: string }>(
     `INSERT INTO clearances (
        workspace_id, content_version_id, decision, state, reviewer, comment
      ) VALUES ($1, $2, $3, $4, $5, $6)
+     ON CONFLICT (content_version_id) DO UPDATE SET
+       workspace_id = EXCLUDED.workspace_id,
+       decision = EXCLUDED.decision,
+       state = EXCLUDED.state,
+       reviewer = EXCLUDED.reviewer,
+       comment = EXCLUDED.comment,
+       updated_at = NOW()
      RETURNING id`,
     [workspaceId, versionId, decision, newState, reviewer, comment ? comment.trim() : null]
   );
@@ -222,6 +229,11 @@ export async function decideReview(
 
   // 4. If approved: trace and lock dependencies in clearance_dependencies
   if (decision === 'approved') {
+    // Clear any prior dependencies if re-approving
+    await db(
+      `DELETE FROM clearance_dependencies WHERE clearance_id = $1`,
+      [clearanceId]
+    );
     // Find all findings with link_status = 'confirmed' AND a valid source_version_id
     interface FindingDep {
       claim_id: string | null;
