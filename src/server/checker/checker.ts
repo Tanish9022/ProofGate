@@ -135,25 +135,26 @@ export function detectDeterministicContext(
   fullText: string
 ): 'historical' | 'quoted' | 'hypothetical' | null {
   const quoteIdx = fullText.indexOf(quote);
-  const start = Math.max(0, quoteIdx !== -1 ? quoteIdx - 80 : 0);
-  const end = Math.min(fullText.length, (quoteIdx !== -1 ? quoteIdx + quote.length : 0) + 80);
-  const surrounding = (quoteIdx !== -1 ? fullText.slice(start, end) : quote).toLowerCase();
+  if (quoteIdx === -1) return null;
+
+  // Context window immediately surrounding quote (50 chars before, 25 chars after)
+  const start = Math.max(0, quoteIdx - 50);
+  const end = Math.min(fullText.length, quoteIdx + quote.length + 25);
+  const surrounding = fullText.slice(start, end).toLowerCase();
   const lowerQuote = quote.toLowerCase();
 
-  // 1. Quoted attribution
-  const quoteAttribution = /\b(?:according to|said|stated|claims?|reported|quoted|testified)\b/i;
+  // 1. Quoted attribution in the immediate statement
+  // DO NOT match bare "claim" or "claims" because "claim" is a common noun in marketing copy
+  const quoteAttribution = /\b(?:according to|as reported by|as stated by|said that|said the|said|stated|quoted|testified|claimed that|claimed by)\b/i;
   if (quoteAttribution.test(surrounding) || quoteAttribution.test(lowerQuote)) {
     return 'quoted';
   }
-  // Direct quotation marks around quote or in surrounding
-  if (/["'“](?:[^"'”]{3,})["'”]/.test(surrounding) && (surrounding.includes('"') || surrounding.includes('“'))) {
-    // If the sentence or quote contains quotes
-    if (surrounding.includes('said') || surrounding.includes('cto') || surrounding.includes('according')) {
-      return 'quoted';
-    }
+  // Direct quotation marks around quote or with attribution
+  if (/["'“](?:[^"'”]{3,})["'”]/.test(surrounding) && (surrounding.includes('said') || surrounding.includes('cto') || surrounding.includes('according'))) {
+    return 'quoted';
   }
 
-  // 2. Historical markers
+  // 2. Historical markers in the immediate statement
   const historicalPatterns = [
     /\bin (?:19\d\d|20[0-2]\d)\b/i,
     /\blast (?:year|quarter|month|week)\b/i,
@@ -178,7 +179,7 @@ export function detectDeterministicContext(
     }
   }
 
-  // 3. Hypothetical markers
+  // 3. Hypothetical markers in the immediate statement
   const hypotheticalPatterns = [
     /\bif\b/i,
     /\bcould be\b/i,
@@ -272,6 +273,21 @@ export async function runDeterministicChecks(
 
   // 1. Check Claims against Fact Sources
   for (const claim of claims) {
+    if (!claim.fact_key) {
+      findings.push({
+        kind: 'claim',
+        status: 'unverifiable',
+        severity: 'warning',
+        quote: claim.quote,
+        start_idx: claim.start_idx,
+        end_idx: claim.end_idx,
+        explanation: 'No approved source covers this factual claim.',
+        suggested_fix: 'Remove the claim or ask a knowledge owner to add an approved source.',
+        link_status: null,
+      });
+      continue;
+    }
+
     // Deterministic context analysis
     const detectedContext = detectDeterministicContext(claim.quote, text);
     const effectiveContext = detectedContext || claim.context;
@@ -287,21 +303,6 @@ export async function runDeterministicChecks(
         end_idx: claim.end_idx,
         explanation: `Historical or contextual claim (${effectiveContext}): no dependency created on current facts.`,
         suggested_fix: null,
-        link_status: null,
-      });
-      continue;
-    }
-
-    if (!claim.fact_key) {
-      findings.push({
-        kind: 'claim',
-        status: 'unverifiable',
-        severity: 'warning',
-        quote: claim.quote,
-        start_idx: claim.start_idx,
-        end_idx: claim.end_idx,
-        explanation: 'No approved source covers this factual claim.',
-        suggested_fix: 'Remove the claim or ask a knowledge owner to add an approved source.',
         link_status: null,
       });
       continue;
@@ -515,7 +516,7 @@ export async function runDeterministicChecks(
             start_idx: m.index,
             end_idx: m.index + m[0].length,
             explanation: String(val.message || 'Avoid unprovable guarantees and banned terms.'),
-            suggested_fix: 'Remove or rephrase this claim to avoid absolute guarantees.',
+            suggested_fix: 'Replace with "Built for".',
             link_status: 'confirmed',
           });
         }

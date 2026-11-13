@@ -59,7 +59,7 @@ export function extractClaimsFallback(
     const sEnd = Math.min(text.length, end + 80);
     const surrounding = text.slice(sStart, sEnd).toLowerCase();
 
-    if (/\b(?:according to|said|stated|claims?|reported|quoted)\b/i.test(surrounding) || (surrounding.includes('"') && (surrounding.includes('cto') || surrounding.includes('said')))) {
+    if (/\b(?:according to|said|stated|reported|quoted|testified|claimed that|claimed by)\b/i.test(surrounding) || (surrounding.includes('"') && (surrounding.includes('cto') || surrounding.includes('said')))) {
       return 'quoted';
     }
     if (/\b(?:in (?:19\d\d|20[0-2]\d)|last (?:year|quarter|month)|previously|was paying|was priced|was extended|were paying|used to|earlier|historically|prior to|back in|before switching|before the price)\b/i.test(surrounding)) {
