@@ -12,7 +12,7 @@ const runEvalSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const ctx = await getRequestContext(request, 'reviewer');
+  const ctx = await getRequestContext(request);
   if (ctx instanceof NextResponse) return ctx;
 
   try {
