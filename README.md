@@ -66,7 +66,7 @@ ProofGate includes a built-in **Interactive In-App Tour Guide** that automatical
 
 | Task | Handled By | Why |
 | :--- | :--- | :--- |
-| **Claim Extraction** | Gemini API (`gemini-3.5-flash-lite`) | Natural language understanding, parsing PDF/DOCX/images, context labeling. |
+| **Claim Extraction** | Gemini API (`gemini-2.0-flash`) | Natural language understanding, parsing PDF/DOCX/images, context labeling. |
 | **Verbatim Quote Check** | TypeScript code | Discards any claim where the quote is not an exact substring of the original text. |
 | **Numeric & Unit Comparison** | Deterministic TypeScript | Ensures prices, percentages, dates, and units are strictly matched without model drift. |
 | **Clearance Decision** | Human Reviewer | The system never publishes or rewrites copy autonomously. |
@@ -143,7 +143,7 @@ Fill in your configuration:
 ```env
 DATABASE_URL=postgresql://user:password@ep-host.neon.tech/neondb?sslmode=require
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-3.5-flash-lite
+GEMINI_MODEL=gemini-2.0-flash
 APP_BASE_URL=http://localhost:3000
 RATE_LIMIT_ANALYZE_PER_HOUR=20
 ```
@@ -220,7 +220,7 @@ AI coding tools were used during development; `AGENTS.md` and `MEMORY.md` docume
 - **Key Architectural Decisions**:
   1. **Demo Mode & Zero-Login Wall**: Every visitor gets an isolated demo workspace via cookie `pg_ws`, enabling instant evaluation in incognito windows without signup friction.
   2. **Single Next.js Deployment**: Unified App Router API handlers and React 19 frontend—eliminating cold-start latency and multi-service failure points.
-  3. **Multi-Model Resilience Cascade**: Automated fallback across candidate Gemini models (`gemini-3.5-flash-lite` $\rightarrow$ `gemini-3.1-flash-lite` $\rightarrow$ `gemini-3.8-flash`) followed by deterministic regex extraction if API calls fail or are rate limited.
+  3. **Multi-Model Resilience Cascade**: Automated fallback across candidate Gemini models (`gemini-2.0-flash` $\rightarrow$ `gemini-1.5-flash` $\rightarrow$ `gemini-1.5-flash-8b`) followed by deterministic regex extraction if API calls fail or are rate limited.
 
 ---
 
