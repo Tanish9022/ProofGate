@@ -1,4 +1,4 @@
-﻿# ProofGate
+# ProofGate
 
 > **Verify brand and marketing content against approved facts. Keep approvals honest when facts change.**  
 > Built for **CodeNexus India 2026** (Round 2) · Problem Owner: **Inkloom AI** · Team **MANTIS** (Tanish Dhende & Khushi Kasar).
