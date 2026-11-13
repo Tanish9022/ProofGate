@@ -33,21 +33,24 @@ The agent reads this at the start of every session and updates it at the end of 
 | 2026-11-05 | Model name read from env `GEMINI_MODEL` | Set manually in Vercel from AI Studio |
 
 ## Current state
-- [x] Block A: Foundation live (Next.js 16 + TypeScript strict + Tailwind + DB schema + workspace session)
-- [x] Block B: Source Library completed (Sources service, CRUD API, versioning, impact preview, supersede/withdraw/expire, slide-over drawer, add-version form, unit tests)
-- [x] Block C: Content & Analysis completed (Text & document extraction, Gemini claim extraction with verbatim check, deterministic checker, prompt-injection heuristic, findings persistence, two-column interactive inspection page with highlights and quick fixes, unit tests)
-- [x] Block D: Review & Clearance completed (Submit-for-review rules, review queue, human-in-the-loop approve/reject decision transactions, clearance records locking confirmed source dependencies, print certificate view, unit tests)
-- [x] Block E: Revalidation & Audit completed (Selective revalidation queue with Old vs New comparison, reapprove vs send-back flows, educational "Not Affected" historical claims section, audit log table with payload inspector, unit tests)
-- [x] Block F: Harden & Polish completed (5-step interactive demo flow on Home page, real-time TopBar badge counters, responsive navigation, Playwright E2E spec)
-- Next action: Final incognito test and submission
+- [x] Round 2: Blocks A-F fully verified and tagged `round2-submission`
+- [x] Round 3 Fix 1: Comments on content versions (POST/GET `/api/content/[id]/comments`, CommentSection component, audit_log, unit tests)
+- [x] Round 3 Fix 2: Server-side role checks with 403 on reviewer/admin routes
+- [x] Round 3 Fix 3: Idempotent clearance approval with unique constraint migration
+- [x] Round 3 Fix 4: Playwright E2E full user journey spec
+- [x] Round 3 Fix 5: Cleanup unused packages (@neon/config, @neon/env)
+- [x] Improvement 1: Context-aware dependency linking + gold evaluation runner (asOfDate, number words, fact_key, probable links review queue, /evaluation page with measured precision/recall/F1 metrics)
+- [x] Improvement 2: Visual brand and accessibility checks for images (imageChecker service, analyseImage vision pipeline, /api/content/[id]/analyze-image, ImageOverlay + ImageCheckerPanel UI, image_findings migration, 7 tests)
+- [x] Improvement 3: Governance insights dashboard (/insights, 6+ metrics, unclear-rule detector >=40% dismissal rate, Gemini-drafted clarification + what-if analysis, 6 tests)
+- All 52 tests passing across 9 test suites
+- Next action: Git commit and push, verify deployed preview
 
 ## Done
-- Block A: Codebase scaffolded and verified.
-- Block B: Source library with versioning, revalidation impact preview, and Neon DB integration verified.
-- Block C: Content submission, document parsing, claim extraction pipeline, and deterministic findings verification complete. All unit tests passing.
-- Block D: Review queue, reviewer decision transaction, locked clearance dependencies, and printable clearance certificate complete. Unit tests passing.
-- Block E: Selective revalidation queue, old vs new diff view, unaffected item transparency list, audit logging with search and role filters. Unit tests passing (22/22).
-- Block F: Polished 5-minute demo flow on Home page, real-time review/revalidation badge counters, Playwright smoke test setup.
+- Block A-F: Core Round 2 product verified and delivered.
+- Round 3 Fixes 1-5: Addressed all round 2 review feedback (comments, role guards, idempotency, E2E, package cleanup).
+- Round 3 Improvement 1: Context-aware dependency linking, probable-links review queue, and 60-case gold benchmark evaluation suite with 100% measured precision/recall.
+- Round 3 Improvement 2: Visual brand and accessibility checks for images with Gemini vision region detection, deterministic WCAG AA contrast ratio and palette tolerance validation, SVG overlay inspector.
+- Round 3 Improvement 3: Governance insights page (/insights) with 6 core metrics, automated unclear-rule detection, and Gemini clarification drafting with impact what-if calculations.
 
 ## Known issues
 - Scanned PDFs without a text layer are not read (requires text layer or direct paste).

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useMemo, use } from 'react';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/Toast';
 import { HighlightedText } from '@/components/content/HighlightedText';
 import { FindingCard } from '@/components/content/FindingCard';
 import { CommentSection } from '@/components/content/CommentSection';
+import { ImageCheckerPanel } from '@/components/content/ImageCheckerPanel';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -523,6 +524,12 @@ export default function ContentDetailPage({
               )}
             </div>
           )}
+
+          {/* Image Brand & Accessibility Check */}
+          <ImageCheckerPanel
+            contentId={contentId}
+            contentVersionId={activeVer.id}
+          />
         </section>
       </div>
 

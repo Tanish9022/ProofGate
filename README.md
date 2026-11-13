@@ -5,7 +5,7 @@
 
 🌐 **Live Demo:** [https://proof-gate-dusky.vercel.app/](https://proof-gate-dusky.vercel.app/)
 
-[![Tests](https://img.shields.io/badge/Vitest-22%2F22%20Passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/Vitest-52%2F52%20Passing-brightgreen.svg)](tests/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict%20(0%20errors)-blue.svg)](tsconfig.json)
 [![Next.js](https://img.shields.io/badge/Next.js-16.4.5%20(App%20Router)-black.svg)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/Database-Neon%20Serverless%20Postgres-00e599.svg)](https://neon.tech/)
@@ -169,7 +169,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser (or in an in
 ProofGate includes unit tests covering the rules engine, dependency graph, and audit logging:
 
 ```bash
-# Run Vitest unit tests (all 22 passing)
+# Run Vitest unit tests (all 52 passing across 9 test suites)
 npm run test
 
 # Run TypeScript strict type-checking (0 errors)
@@ -178,15 +178,18 @@ npx tsc --noEmit
 # Run Next.js production build
 npm run build
 
-# Run Playwright smoke test
+# Run Playwright end-to-end user journey test
 npm run e2e
 ```
 
 ### Unit Test Highlights
-- **`tests/checker.test.ts`**: Verifies exact price tolerances, unit mismatches, currency conversions, banned superlatives, and prompt injection defense.
+- **`tests/checker.test.ts`**: Verifies exact price tolerances, unit mismatches, currency conversions, banned superlatives, qualifiers, number-words translation, and context detection.
 - **`tests/sources.test.ts`**: Verifies impact preview calculations, source version retirement, and active clearance identification.
 - **`tests/clearance.test.ts`**: Verifies blocker submission locks, human approval transactions, and confirmed dependency pointers.
 - **`tests/revalidate.test.ts`**: Verifies selective revalidation isolation, historical context exemptions, re-approval state transitions, and audit payload schemas.
+- **`tests/imageChecker.test.ts`**: Verifies WCAG AA contrast ratio math, luminance formulas, palette color distance thresholds, and commutativity.
+- **`tests/insights.test.ts`**: Verifies governance dismissal rates, severity calculations, and unclear rule detection thresholds (>=40% dismissal rate).
+- **`tests/eval.test.ts`**: Verifies the Northstar gold benchmark runner, confusion matrix metrics (precision/recall/F1), and evaluation run persistence.
 
 ---
 

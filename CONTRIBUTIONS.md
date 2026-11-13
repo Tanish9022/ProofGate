@@ -40,3 +40,5 @@ Each entry: `Date | Person | Item | Notes`
 | 2026-11-11 | Tanish | Improvement 1 Part A: Checker upgrades (asOfDate, number words, fact_key migration, qualifiers, context rules, tests) | Imp 1 Part A |
 | 2026-11-11 | Tanish | Improvement 1 Part B: Probable links queue (confirm/reject endpoints, audit logs, review UI, dependency isolation test) | Imp 1 Part B |
 | 2026-11-11 | Tanish | Improvement 1 Part C & D: Gold benchmark evaluation runner (runner.ts, gold JSON suites, /evaluation page, measured precision/recall/F1 metrics) | Imp 1 Part C & D |
+| 2026-11-13 | Tanish | Improvement 2: Image brand and accessibility checker (imageChecker service, analyseImage pipeline, analyze-image API, ImageOverlay + ImageCheckerPanel UI, image_findings migration, 7 unit tests) | Imp 2 |
+| 2026-11-13 | Tanish | Improvement 3: Governance insights dashboard (/insights, 6+ metrics, unclear-rule detector >=40% dismissal, Gemini-drafted clarification + what-if count, 6 unit tests) | Imp 3 |

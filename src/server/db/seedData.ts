@@ -72,6 +72,29 @@ export const SEED_SOURCES = [
     value: { text: 'Friendly, professional, specific. No hype.' },
     validUntil: null as string | null,
   },
+  {
+    kind: 'asset' as const,
+    key: 'brand_palette',
+    title: 'Approved Brand Colour Palette',
+    owner: 'Brand Team',
+    value: {
+      approved_hex: ['#1a56db', '#ffffff', '#111928', '#6b7280', '#f9fafb'],
+      tolerance: 30,
+      description: 'Approved primary and neutral colours for Northstar brand assets'
+    },
+    validUntil: null as string | null,
+  },
+  {
+    kind: 'asset' as const,
+    key: 'contrast_threshold',
+    title: 'WCAG AA Contrast Threshold',
+    owner: 'Accessibility Team',
+    value: {
+      min_ratio: 4.5,
+      description: 'Minimum contrast ratio 4.5:1 for normal text per WCAG 2.1 AA'
+    },
+    validUntil: null as string | null,
+  },
 ];
 
 export const SAMPLE_CONTENT = [

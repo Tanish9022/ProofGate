@@ -50,6 +50,7 @@ export function TopBar() {
     { href: '/review', label: 'Review', count: reviewCount },
     { href: '/revalidation', label: 'Revalidation', count: revalCount },
     { href: '/evaluation', label: 'Evaluation' },
+    { href: '/insights', label: 'Insights' },
     { href: '/audit', label: 'Audit' },
   ];
 
