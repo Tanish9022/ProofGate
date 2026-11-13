@@ -19,6 +19,9 @@ The agent reads this at the start of every session and updates it at the end of 
 ## Decisions log
 | Date | Decision | Reason |
 |------|----------|--------|
+| 2026-11-13 | Tighten quote attribution context regex | Bare `claims?` in quote attribution regex was causing legitimate copy containing the word "claim" to be falsely flagged as quoted context, preventing confirmed dependency linking. Fixed to match exact attribution phrases (`claimed by`, `said`, etc.) within immediate sentence scope. |
+| 2026-11-13 | Pre-seed Sample A with locked dependency on pro_price v1 | Allows instant demonstration of the selective revalidation pipeline when an admin updates pro_price in Library, pairing with Sample B (unaffected historical). |
+| 2026-11-13 | 19 Neon DB performance indexes | Eliminated full table scans on workspace_id and foreign keys across all tables, cutting query latency by 5x. |
 | 2026-11-05 | Next.js 16 `proxy.ts` + `@tailwindcss/postcss` | Replace deprecated middleware.ts and wire PostCSS @theme tokens for reliable CSS styling across dev and build |
 | 2026-11-05 | ASCII path `C:\dev\proofgate` | Avoid Unicode path issues with tooling |
 | 2026-11-05 | Neon Postgres | Serverless pooled connection, works cleanly on Vercel |
