@@ -213,6 +213,38 @@ If no issues found, return { "regions": [] }.`;
   return findings;
 }
 
+let imageTableEnsured = false;
+
+async function ensureImageFindingsTable(): Promise<void> {
+  if (imageTableEnsured) return;
+  try {
+    await db(`
+      CREATE TABLE IF NOT EXISTS image_findings (
+        id uuid primary key default gen_random_uuid(),
+        content_version_id uuid not null references content_versions(id) on delete cascade,
+        workspace_id uuid not null,
+        kind text not null check (kind in ('palette_off_brand','contrast_below_aa','logo_missing','text_unreadable')),
+        severity text not null check (severity in ('info','warning','blocker')),
+        region_x real,
+        region_y real,
+        region_w real,
+        region_h real,
+        explanation text not null,
+        hex_found text,
+        hex_expected text,
+        contrast_ratio real,
+        created_at timestamptz not null default now()
+      )
+    `);
+    await db(`
+      CREATE INDEX IF NOT EXISTS image_findings_version ON image_findings(content_version_id)
+    `);
+    imageTableEnsured = true;
+  } catch (err) {
+    console.error('Error ensuring image_findings table:', err);
+  }
+}
+
 /**
  * Persist image findings to DB and write audit_log
  */
@@ -221,6 +253,7 @@ export async function saveImageFindings(
   contentVersionId: string,
   findings: ImageRegionFinding[]
 ): Promise<void> {
+  await ensureImageFindingsTable();
   for (const f of findings) {
     await db(
       `INSERT INTO image_findings
@@ -249,6 +282,7 @@ export async function getImageFindings(
   workspaceId: string,
   contentVersionId: string
 ): Promise<Array<ImageRegionFinding & { id: string; created_at: string }>> {
+  await ensureImageFindingsTable();
   return await db<ImageRegionFinding & { id: string; created_at: string }>(
     `SELECT id, kind, severity, region_x, region_y, region_w, region_h,
             explanation, hex_found, hex_expected, contrast_ratio, created_at
