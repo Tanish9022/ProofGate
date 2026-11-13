@@ -123,7 +123,7 @@ export function DemoTourBanner() {
   };
 
   return (
-    <aside aria-label="Interactive Demo Guide" className="bg-paper-warm border-b border-paper-line text-ink transition-all">
+    <aside aria-label="Interactive Demo Guide" className="bg-paper-warm border-b border-paper-line text-ink transition-all print:hidden">
       <div className="mx-auto max-w-7xl px-4 py-2.5 sm:px-6">
         <div className="flex items-center justify-between gap-4">
           {/* Left: Guide Label & Progress */}

@@ -36,7 +36,7 @@ export function TopBar() {
     }
 
     loadBadges();
-    const interval = setInterval(loadBadges, 10000);
+    const interval = setInterval(loadBadges, 30000);
     return () => {
       isMounted = false;
       clearInterval(interval);
@@ -55,7 +55,7 @@ export function TopBar() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-paper-line bg-paper/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-paper-line bg-paper/95 backdrop-blur-sm print:hidden">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         {/* Brand */}
         <Link

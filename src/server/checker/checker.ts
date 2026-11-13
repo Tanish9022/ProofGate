@@ -541,7 +541,7 @@ export async function runDeterministicChecks(
               end_idx: m.index + m[0].length,
               explanation: `Spelling error: "${m[0]}" should be formatted as "${val.preferred}".`,
               suggested_fix: `Replace with "${val.preferred}".`,
-              link_status: 'confirmed',
+              link_status: null, // Spelling guidance does not create a clearance dependency
             });
           }
         }

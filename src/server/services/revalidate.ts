@@ -92,7 +92,39 @@ export async function getRevalidationData(
     ORDER BY ri.created_at DESC
   `;
 
-  const rows = await db<RawRevalRow>(query, [workspaceId]);
+  interface RawNotAffected {
+    content_id: string;
+    content_title: string;
+    version: number;
+    quote: string;
+    context: string;
+  }
+
+  const notAffectedQuery = `
+    SELECT DISTINCT
+      c.id AS content_id,
+      c.title AS content_title,
+      cv.version,
+      clm.quote,
+      clm.context
+    FROM clearances cl
+    JOIN content_versions cv ON cv.id = cl.content_version_id
+    JOIN contents c ON c.id = cv.content_id
+    JOIN claims clm ON clm.content_version_id = cv.id
+    WHERE cl.workspace_id = $1
+      AND cl.state = 'current'
+      AND clm.context IN ('historical', 'quoted', 'hypothetical')
+      AND NOT EXISTS (
+        SELECT 1 FROM revalidation_items ri
+        WHERE ri.clearance_id = cl.id AND ri.status = 'open'
+      )
+  `;
+
+  // Parallelize both queries for speed
+  const [rows, notAffectedRows] = await Promise.all([
+    db<RawRevalRow>(query, [workspaceId]),
+    db<RawNotAffected>(notAffectedQuery, [workspaceId]),
+  ]);
 
   const items: RevalidationItemDetail[] = rows.map(r => {
     const oldDisplay = r.old_value?.display
@@ -127,38 +159,6 @@ export async function getRevalidationData(
       new_value: newDisplay,
     };
   });
-
-  // Calculate "Not affected" items:
-  // Approved clearances that mention the topic historically or in quotes, but were NOT reopened
-  interface RawNotAffected {
-    content_id: string;
-    content_title: string;
-    version: number;
-    quote: string;
-    context: string;
-  }
-
-  const notAffectedQuery = `
-    SELECT DISTINCT
-      c.id AS content_id,
-      c.title AS content_title,
-      cv.version,
-      clm.quote,
-      clm.context
-    FROM clearances cl
-    JOIN content_versions cv ON cv.id = cl.content_version_id
-    JOIN contents c ON c.id = cv.content_id
-    JOIN claims clm ON clm.content_version_id = cv.id
-    WHERE cl.workspace_id = $1
-      AND cl.state = 'current'
-      AND clm.context IN ('historical', 'quoted', 'hypothetical')
-      AND NOT EXISTS (
-        SELECT 1 FROM revalidation_items ri
-        WHERE ri.clearance_id = cl.id AND ri.status = 'open'
-      )
-  `;
-
-  const notAffectedRows = await db<RawNotAffected>(notAffectedQuery, [workspaceId]);
 
   const notAffected: NotAffectedItem[] = notAffectedRows.map(r => ({
     content_id: r.content_id,

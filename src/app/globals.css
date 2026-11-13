@@ -123,3 +123,37 @@ h1, h2, h3 { font-family: var(--font-serif); }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ─── Print Stylesheet ─── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 15mm 15mm 15mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+  }
+
+  header,
+  nav,
+  aside,
+  footer,
+  .skip-link,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+}

@@ -18,3 +18,4 @@ CREATE TABLE IF NOT EXISTS image_findings (
 
 CREATE INDEX IF NOT EXISTS image_findings_version
   ON image_findings(content_version_id);
+
