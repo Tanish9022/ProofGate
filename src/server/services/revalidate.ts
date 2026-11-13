@@ -219,78 +219,63 @@ export async function resolveRevalidationItem(
   );
 
   if (action === 'reapprove') {
-    // 2. Mark previous clearance as revalidated / superseded
+    // 2. Update existing clearance in-place (satisfies one_clearance_per_version unique constraint)
     await db(
-      `UPDATE clearances SET state = 'revalidation_required' WHERE id = $1 AND workspace_id = $2`,
-      [item.clearance_id, workspaceId]
-    );
-
-    // 3. Create a fresh clearance
-    const newClearanceRows = await db<{ id: string }>(
-      `INSERT INTO clearances (
-         workspace_id, content_version_id, decision, state, reviewer, comment
-       ) VALUES ($1, $2, 'approved', 'current', $3, $4)
-       RETURNING id`,
+      `UPDATE clearances SET
+         decision = 'approved',
+         state = 'current',
+         reviewer = $1,
+         comment = $2,
+         decided_at = NOW()
+       WHERE id = $3 AND workspace_id = $4`,
       [
-        workspaceId,
-        item.content_version_id,
         reviewer,
         comment.trim() || 'Re-approved with updated current source versions.',
+        item.clearance_id,
+        workspaceId,
       ]
     );
-    const newClearanceId = newClearanceRows[0].id;
 
-    // 4. Copy existing dependencies, updating the triggered source version to new_source_version_id
-    interface DepRow {
-      source_version_id: string;
-      claim_id: string | null;
-      link_status: string;
-    }
-    const oldDeps = await db<DepRow>(
-      `SELECT source_version_id, claim_id, link_status
-       FROM clearance_dependencies
-       WHERE clearance_id = $1 AND workspace_id = $2`,
-      [item.clearance_id, workspaceId]
-    );
-
-    for (const d of oldDeps) {
-      const targetSourceVer =
-        d.source_version_id === item.trigger_source_version_id && item.new_source_version_id
-          ? item.new_source_version_id
-          : d.source_version_id;
-
+    // 3. Update clearance_dependencies: update triggered source version to new_source_version_id
+    if (item.new_source_version_id) {
       await db(
-        `INSERT INTO clearance_dependencies (
-           clearance_id, workspace_id, source_version_id, claim_id, link_status
-         ) VALUES ($1, $2, $3, $4, $5)`,
-        [newClearanceId, workspaceId, targetSourceVer, d.claim_id, d.link_status]
+        `UPDATE clearance_dependencies
+         SET source_version_id = $1
+         WHERE clearance_id = $2 AND source_version_id = $3`,
+        [item.new_source_version_id, item.clearance_id, item.trigger_source_version_id]
+      );
+    } else {
+      await db(
+        `DELETE FROM clearance_dependencies
+         WHERE clearance_id = $1 AND source_version_id = $2`,
+        [item.clearance_id, item.trigger_source_version_id]
       );
     }
 
-    // 5. Update content_version state back to cleared
+    // 4. Update content_version state back to cleared
     await db(
       `UPDATE content_versions SET state = 'cleared' WHERE id = $1 AND workspace_id = $2`,
       [item.content_version_id, workspaceId]
     );
 
-    // 6. Audit log
+    // 5. Audit log
     await db(
       `INSERT INTO audit_log (workspace_id, actor_role, action, entity_type, entity_id, details)
        VALUES ($1, $2, 'clearance.reapproved', 'clearance', $3, $4)`,
       [
         workspaceId,
         reviewer,
-        newClearanceId,
+        item.clearance_id,
         JSON.stringify({
-          previousClearanceId: item.clearance_id,
+          clearanceId: item.clearance_id,
           contentTitle: item.content_title,
           revalidationItemId: itemId,
-          comment,
+          comment: comment.trim(),
         }),
       ]
     );
 
-    return { success: true, newClearanceId };
+    return { success: true, newClearanceId: item.clearance_id };
   } else {
     // Send back to creator
     await db(
