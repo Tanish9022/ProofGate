@@ -89,14 +89,14 @@ describe('Improvement 1 - Gold Evaluation Runner & Metrics', () => {
 
     // Measured metrics on the 40 detection gold cases:
     expect(metrics.total_cases).toBe(40);
-    expect(metrics.passed_cases).toBe(39); // 39/40 passed (97.5% accuracy)
+    expect(metrics.passed_cases).toBe(40); // 40/40 passed (100% accuracy)
     expect(metrics.true_positives).toBe(16);
-    expect(metrics.false_positives).toBe(1); // TC-028 term dep
+    expect(metrics.false_positives).toBe(0);
     expect(metrics.false_negatives).toBe(0); // 100% recall
-    expect(metrics.true_negatives).toBe(23);
-    expect(metrics.precision).toBeCloseTo(0.941, 2); // 94.1% (16/17)
+    expect(metrics.true_negatives).toBe(24);
+    expect(metrics.precision).toBe(1.0); // 100.0% (16/16)
     expect(metrics.recall).toBe(1.0); // 100.0% (16/16)
-    expect(metrics.f1_score).toBeCloseTo(0.97, 2);
+    expect(metrics.f1_score).toBe(1.0);
   });
 });
 
