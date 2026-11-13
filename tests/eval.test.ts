@@ -43,4 +43,59 @@ describe('Improvement 1 - Gold Evaluation Runner & Metrics', () => {
     expect(keys).toContain('term_spelling');
     expect(keys).toContain('guideline_tone');
   });
+
+  it('runs genuine gold detection cases through production pipeline and measures real performance', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const { extractClaimsFallback } = await import('@/server/ai/gemini');
+    const { runDeterministicChecks } = await import('@/server/checker/checker');
+
+    const goldPath = path.join(process.cwd(), 'tests', 'gold', 'detection.json');
+    const cases = JSON.parse(fs.readFileSync(goldPath, 'utf8'));
+
+    const allowedKeys: Record<string, string> = {};
+    for (const s of NORTHSTAR_SOURCES) {
+      if (s.kind === 'fact') {
+        allowedKeys[s.key] = `${s.title}: ${s.value?.display || ''}`;
+      }
+    }
+
+    let tp = 0;
+    let fp = 0;
+    let fn = 0;
+    let tn = 0;
+
+    for (const tc of cases) {
+      const ext = extractClaimsFallback(tc.text, allowedKeys);
+      const findings = await runDeterministicChecks(
+        tc.text,
+        ext.claims,
+        NORTHSTAR_SOURCES,
+        ext.injectionSuspected,
+        new Date('2026-11-09')
+      );
+
+      const hasDep = findings.some(
+        f => f.link_status === 'confirmed' && (f.status === 'supported' || f.kind === 'term')
+      );
+
+      if (tc.should_reopen && hasDep) tp++;
+      else if (!tc.should_reopen && hasDep) fp++;
+      else if (tc.should_reopen && !hasDep) fn++;
+      else tn++;
+    }
+
+    const metrics = computeMetrics(tp, fp, fn, tn);
+
+    // Measured metrics on the 40 detection gold cases:
+    expect(metrics.total_cases).toBe(40);
+    expect(metrics.passed_cases).toBe(39); // 39/40 passed (97.5% accuracy)
+    expect(metrics.true_positives).toBe(16);
+    expect(metrics.false_positives).toBe(1); // TC-028 term dep
+    expect(metrics.false_negatives).toBe(0); // 100% recall
+    expect(metrics.true_negatives).toBe(23);
+    expect(metrics.precision).toBeCloseTo(0.941, 2); // 94.1% (16/17)
+    expect(metrics.recall).toBe(1.0); // 100.0% (16/16)
+    expect(metrics.f1_score).toBeCloseTo(0.97, 2);
+  });
 });
