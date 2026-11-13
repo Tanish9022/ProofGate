@@ -79,16 +79,35 @@ export function DemoTourBanner() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
-  // Auto-detect step based on current page
+  // Auto-detect step and auto-switch role based on current page
   useEffect(() => {
-    if (pathname === '/content/new') setCurrentStep(1);
-    else if (pathname.startsWith('/content/') && pathname !== '/content/new') setCurrentStep(2);
-    else if (pathname === '/review') setCurrentStep(3);
-    else if (pathname === '/library') setCurrentStep(4);
-    else if (pathname === '/revalidation') setCurrentStep(5);
-    else if (pathname === '/evaluation') setCurrentStep(6);
-    else if (pathname === '/insights') setCurrentStep(7);
-  }, [pathname]);
+    if (pathname === '/content/new') {
+      setCurrentStep(1);
+      if (role !== 'creator' && role !== 'admin') setRole('creator');
+    }
+    else if (pathname.startsWith('/content/') && pathname !== '/content/new') {
+      setCurrentStep(2);
+      if (role !== 'creator' && role !== 'admin') setRole('creator');
+    }
+    else if (pathname === '/review') {
+      setCurrentStep(3);
+      if (role !== 'reviewer' && role !== 'admin') setRole('reviewer');
+    }
+    else if (pathname === '/library') {
+      setCurrentStep(4);
+    }
+    else if (pathname === '/revalidation') {
+      setCurrentStep(5);
+      if (role !== 'reviewer' && role !== 'admin') setRole('reviewer');
+    }
+    else if (pathname === '/evaluation') {
+      setCurrentStep(6);
+    }
+    else if (pathname === '/insights') {
+      setCurrentStep(7);
+      if (role !== 'admin') setRole('admin');
+    }
+  }, [pathname, role, setRole]);
 
   if (isDismissed) return null;
 
@@ -204,9 +223,14 @@ export function DemoTourBanner() {
                 </button>
               )}
 
-              {/* Direct Next Link */}
+              {/* Direct Next Link with Auto-Role Switch */}
               <Link
                 href={activeTour.href}
+                onClick={() => {
+                  if (activeTour.role && activeTour.role !== 'admin' && activeTour.roleBadge !== 'All Roles') {
+                    setRole(activeTour.role as any);
+                  }
+                }}
                 className="px-3 py-1 text-xs font-semibold rounded bg-ink text-paper hover:bg-ink/90 transition-colors inline-flex items-center gap-1 shadow-xs"
               >
                 <span>{activeTour.cta}</span>
