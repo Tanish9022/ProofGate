@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { AlertTriangle, CheckCircle2, RotateCcw, ChevronDown, ChevronRight, ArrowRight, ShieldCheck, Info, Sparkles } from 'lucide-react';
 import type { RevalidationItemDetail, NotAffectedItem } from '@/server/services/revalidate';
+import { EvaluatorCallout } from '@/components/ui/EvaluatorCallout';
 
 export default function RevalidationPage() {
   const { role } = useRole();
@@ -97,6 +98,32 @@ export default function RevalidationPage() {
             <span>Switch role to <strong>Reviewer</strong> in the top bar to take action.</span>
           </div>
         )}
+      </div>
+
+      <div className="mt-6">
+        <EvaluatorCallout
+          title="Selective Revalidation vs Blanket Invalidation"
+          badge="Core Architectural Flow"
+          summary="When a company fact changes (e.g. price increased from Rs. 499 to Rs. 699), ProofGate avoids blanket re-reviews. It traverses the dependency graph and reopens ONLY clearances that have a confirmed dependency on the superseded version. Historical quotes and unrelated facts stay cleared in 'Not Affected'."
+          steps={[
+            {
+              step: 1,
+              title: 'Inspect Revalidation Queue',
+              instruction: 'View clearances flagged as "Revalidation Required". Review the exact source version diff showing what changed.',
+            },
+            {
+              step: 2,
+              title: 'Verify "Not Affected" Clearances',
+              instruction: 'Check the "Not Affected" list below. Notice that historical case studies quoting old prices (e.g. Acme 2025) remain safely cleared.',
+            },
+            {
+              step: 3,
+              title: 'Resolve Clearance',
+              instruction: 'As Reviewer, either click "Re-approve with Latest Source" if the copy still holds, or "Send Back to Creator" for revision.',
+            },
+          ]}
+          keyInvariant="Zero blanket invalidations. Dependency graph edges are version-specific: changing Source A v1 -> v2 only impacts clearances that explicitly depend on v1."
+        />
       </div>
 
       {loading ? (

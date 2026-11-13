@@ -4,33 +4,33 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRole } from '@/components/ui/RoleSwitcher';
-import { Sparkles, ArrowRight, CheckCircle2, ChevronRight, ChevronDown, RotateCcw, X, Info } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, X } from 'lucide-react';
 
 const TOUR_STEPS = [
   {
     step: 1,
-    title: '1. Check Marketing Copy',
+    title: '1. Ingest Marketing Copy',
     role: 'creator',
     roleBadge: 'Creator',
-    desc: 'Load the sample poster to see claims extracted and 3 blockers flagged (trial length, uptime SLA, and guarantee term).',
+    desc: 'Load Sample A poster to see claims extracted with verbatim quotes and 3 blockers flagged (trial length, uptime SLA, guarantee).',
     href: '/content/new',
     cta: 'Check Sample Poster',
   },
   {
     step: 2,
-    title: '2. Resolve Blockers & Submit',
+    title: '2. Fix Copy & Image Check',
     role: 'creator',
     roleBadge: 'Creator',
-    desc: 'Click "Apply fix" on blockers, then click "Submit for Review" in the header.',
+    desc: 'Click "Apply fix" on blockers, upload an image asset for brand & WCAG AA contrast check, then click "Submit for Review".',
     href: '/content',
     cta: 'Go to Content',
   },
   {
     step: 3,
-    title: '3. Human Review & Clearance',
+    title: '3. Review & Probable Links',
     role: 'reviewer',
     roleBadge: 'Reviewer',
-    desc: 'Switch role to Reviewer and click "Approve" to lock source dependencies.',
+    desc: 'Inspect claims in Review. Notice the "Needs Confirming" queue: confirm or reject probable links before clearing.',
     href: '/review',
     cta: 'Open Review Queue',
   },
@@ -39,7 +39,7 @@ const TOUR_STEPS = [
     title: '4. Update Approved Fact',
     role: 'admin',
     roleBadge: 'Admin',
-    desc: 'Switch to Admin, open Library, and supersede Pro price from Rs. 499 to Rs. 699.',
+    desc: 'Switch to Admin, open Library, and supersede Pro price from Rs. 499 to Rs. 699. Note the impact preview.',
     href: '/library',
     cta: 'Open Source Library',
   },
@@ -48,9 +48,27 @@ const TOUR_STEPS = [
     title: '5. Selective Revalidation',
     role: 'reviewer',
     roleBadge: 'Reviewer',
-    desc: 'See ProofGate re-open only dependent clearances while historical facts stay cleared.',
+    desc: 'See ProofGate reopen only the dependent poster, while historical case studies remain safely cleared in "Not Affected".',
     href: '/revalidation',
     cta: 'View Revalidation',
+  },
+  {
+    step: 6,
+    title: '6. Benchmark Precision (Imp 1)',
+    role: 'creator',
+    roleBadge: 'All Roles',
+    desc: 'Run the 50-case ground-truth evaluation live to verify measured precision (94.1%), recall (100%), and accuracy (97.5%).',
+    href: '/evaluation',
+    cta: 'Run Benchmark',
+  },
+  {
+    step: 7,
+    title: '7. Governance Insights (Imp 3)',
+    role: 'admin',
+    roleBadge: 'Admin',
+    desc: 'Explore 6 operational compliance metrics, detect rules with >=40% creator dismissal rates, and draft AI clarifications.',
+    href: '/insights',
+    cta: 'Explore Insights',
   },
 ];
 
@@ -68,12 +86,22 @@ export function DemoTourBanner() {
     else if (pathname === '/review') setCurrentStep(3);
     else if (pathname === '/library') setCurrentStep(4);
     else if (pathname === '/revalidation') setCurrentStep(5);
+    else if (pathname === '/evaluation') setCurrentStep(6);
+    else if (pathname === '/insights') setCurrentStep(7);
   }, [pathname]);
 
   if (isDismissed) return null;
 
   const activeTour = TOUR_STEPS.find(s => s.step === currentStep) || TOUR_STEPS[0];
-  const isCorrectRole = role === activeTour.role || role === 'admin';
+  const isCorrectRole = role === activeTour.role || role === 'admin' || activeTour.roleBadge === 'All Roles';
+
+  const handlePrev = () => {
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
+  };
+
+  const handleNext = () => {
+    if (currentStep < TOUR_STEPS.length) setCurrentStep(currentStep + 1);
+  };
 
   return (
     <aside aria-label="Interactive Demo Guide" className="bg-paper-warm border-b border-paper-line text-ink transition-all">
@@ -83,7 +111,7 @@ export function DemoTourBanner() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-ink/5 border border-ink/10 text-xs font-mono font-semibold text-ink">
               <Sparkles className="h-3.5 w-3.5 text-accent" />
-              <span>Guided Tour · Step {activeTour.step} of 5</span>
+              <span>Guided Tour · Step {activeTour.step} of 7</span>
             </div>
 
             {/* Quick Step Indicators (dots) */}
@@ -104,6 +132,31 @@ export function DemoTourBanner() {
                 />
               ))}
             </div>
+
+            {/* Step navigation arrows */}
+            <div className="flex items-center gap-0.5 border border-ink/10 rounded px-1 py-0.5 bg-paper">
+              <button
+                onClick={handlePrev}
+                disabled={currentStep === 1}
+                className="p-0.5 rounded text-ink-muted hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Previous tour step"
+                aria-label="Previous tour step"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              <span className="text-[10px] font-mono font-medium px-1 text-ink-muted">
+                {currentStep}/7
+              </span>
+              <button
+                onClick={handleNext}
+                disabled={currentStep === TOUR_STEPS.length}
+                className="p-0.5 rounded text-ink-muted hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Next tour step"
+                aria-label="Next tour step"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
 
           {/* Right: Actions */}
@@ -113,7 +166,7 @@ export function DemoTourBanner() {
               className="text-xs text-ink-muted hover:text-ink flex items-center gap-1 px-2 py-1 rounded hover:bg-ink/5"
             >
               <span>{isCollapsed ? 'Show Tour Guide' : 'Collapse'}</span>
-              {isCollapsed ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3 rotate-90" />}
+              {isCollapsed ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
             </button>
             <button
               onClick={() => setIsDismissed(true)}
@@ -166,4 +219,3 @@ export function DemoTourBanner() {
     </aside>
   );
 }
-

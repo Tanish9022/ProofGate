@@ -9,6 +9,7 @@ import { SourceDrawer } from '@/components/library/SourceDrawer';
 import { AddSourceModal } from '@/components/library/AddSourceModal';
 import { Plus, Search, Layers, RefreshCw } from 'lucide-react';
 import type { SourceSummary, SourceKind } from '@/server/services/sources';
+import { EvaluatorCallout } from '@/components/ui/EvaluatorCallout';
 
 export default function LibraryPage() {
   const { role } = useRole();
@@ -103,6 +104,34 @@ export default function LibraryPage() {
           )}
         </div>
       </div>
+
+      <EvaluatorCallout
+        title="Single Source of Truth & Fact Supersession"
+        badge="Library & Governance"
+        summary="All approved brand facts, pricing tiers, SLAs, prohibited terms, and brand palettes are maintained here with append-only versioning. Clearances lock exact source versions. When an admin updates a fact, ProofGate calculates impact and triggers selective revalidation only for dependent clearances."
+        steps={[
+          {
+            step: 1,
+            title: 'Inspect Approved Facts',
+            instruction: 'Click on "brightdesk.pricing.pro_monthly" (v1 - Rs. 499). Notice its current status and dependents list.',
+          },
+          {
+            step: 2,
+            title: 'Simulate Fact Update (Admin)',
+            instruction: 'Switch role to Admin, click "Supersede Fact", update price to Rs. 699, and review the clearance impact preview.',
+          },
+          {
+            step: 3,
+            title: 'Observe Selective Revalidation',
+            instruction: 'Navigate to "/revalidation" to see only the dependent promotional poster flagged for review.',
+            action: {
+              label: 'Go to Revalidation',
+              href: '/revalidation',
+            },
+          },
+        ]}
+        keyInvariant="Facts are immutable once published; updates create a new source version. Clearances maintain exact pointers to the version they were approved against."
+      />
 
       {/* Controls Bar: Search & Filters */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

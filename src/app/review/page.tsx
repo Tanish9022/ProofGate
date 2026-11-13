@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/Toast';
 import { CheckCircle2, XCircle, ArrowRight, ShieldCheck, ShieldAlert, FileText, RefreshCw, MessageSquare, Sparkles, HelpCircle, Check, X, Link as LinkIcon } from 'lucide-react';
 import type { ReviewQueueItem } from '@/server/services/clearance';
 import { CommentSection } from '@/components/content/CommentSection';
+import { EvaluatorCallout } from '@/components/ui/EvaluatorCallout';
 
 interface ReviewFinding {
   id: string;
@@ -198,6 +199,32 @@ export default function ReviewPage() {
           </Link>
         </div>
       </div>
+
+      {/* Evaluator Guide */}
+      <EvaluatorCallout
+        title="Human Clearance & The 'Needs Confirming' Probable-Links Queue"
+        badge="Round 3 · Improvement 1"
+        improvementNumber={1}
+        summary="Independent human sign-off. When content has ambiguous or model-inferred claims, ProofGate puts them in the 'Needs Confirming' queue with a 'Probable Link' badge. Unconfirmed probable links NEVER create clearance dependencies—preventing false revalidations when sources change."
+        steps={[
+          {
+            step: 1,
+            title: 'Review Extracted Claims',
+            instruction: 'Select a draft from the queue. Inspect each extracted claim, verbatim quote, and associated source version.',
+          },
+          {
+            step: 2,
+            title: 'Confirm or Reject Probable Links',
+            instruction: 'Notice findings with "Probable Link". Click "Confirm Dependency" to link it, or "Reject Link" to isolate it from triggering revalidations.',
+          },
+          {
+            step: 3,
+            title: 'Approve to Lock Clearance',
+            instruction: 'Click "Approve Content". ProofGate creates a clearance locking exact source version IDs into an immutable dependency record.',
+          },
+        ]}
+        keyInvariant="Probable links never auto-create clearance dependencies. Human confirmation is required before any source change can trigger a revalidation."
+      />
 
       {/* Main Review Area */}
       {loading && queue.length === 0 ? (
