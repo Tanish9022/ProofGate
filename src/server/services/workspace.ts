@@ -1,4 +1,4 @@
-﻿import { db } from '@/server/db/client';
+import { db } from '@/server/db/client';
 import { SEED_SOURCES, DEMO_WORKSPACE_NAME } from '@/server/db/seedData';
 
 export interface WorkspaceRow {

@@ -20,3 +20,4 @@ CREATE INDEX IF NOT EXISTS idx_revalidation_items_ws_status ON revalidation_item
 CREATE INDEX IF NOT EXISTS idx_revalidation_items_clearance ON revalidation_items(clearance_id);
 CREATE INDEX IF NOT EXISTS idx_audit_log_ws_created ON audit_log(workspace_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_comments_content_ver ON comments(content_version_id);
+
