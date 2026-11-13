@@ -1,4 +1,4 @@
-﻿import { db } from '@/server/db/client';
+import { db } from '@/server/db/client';
 
 export interface ReviewQueueItem {
   versionId: string;
@@ -214,7 +214,7 @@ export async function decideReview(
        state = EXCLUDED.state,
        reviewer = EXCLUDED.reviewer,
        comment = EXCLUDED.comment,
-       updated_at = NOW()
+       decided_at = NOW()
      RETURNING id`,
     [workspaceId, versionId, decision, newState, reviewer, comment ? comment.trim() : null]
   );
